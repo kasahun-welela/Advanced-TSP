@@ -52,7 +52,7 @@ export default function Program() {
       <h1 className="text-xl md:text-2xl font-bold  my-3  text-primary">
         Explore Our Programs
       </h1>
-      <p className=" text-xl md:text-4xl my-3  font-bold">
+      <p className=" text-xl md:text-4xl my-3  font-bold capitalize">
         our most popular programs
       </p>
       <p className="my-3   md:text-xl text-muted-foreground">
@@ -71,7 +71,7 @@ export default function Program() {
               </div>
               <Image
                 src={program.image}
-                alt="Program Image"
+                alt={program.title}
                 width={400}
                 height={250}
                 className="w-full h-[250px] object-cover rounded-t-xl"
@@ -84,7 +84,7 @@ export default function Program() {
               </p>
             </CardContent>
             <CardFooter className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <Image
                   src={program.avatar}
                   alt="Instructor"
