@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { Button } from "./ui/button";
 import Link from "next/link";
 
 export default function Services() {
@@ -47,7 +46,7 @@ export default function Services() {
         {services.map((service) => (
           <Card
             key={service.id}
-            className="hover:shadow-lg hover:bg-primary hover:text-white"
+            className="hover:shadow-lg   transition-all duration-300"
           >
             <CardHeader className="flex items-center gap-3">
               <Image
@@ -60,7 +59,10 @@ export default function Services() {
               <CardTitle className="text-2xl">{service.title}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-lg lg:text-xl"> {service.description}</p>
+              <p className="text-lg lg:text-xl text-muted-foreground">
+                {" "}
+                {service.description}
+              </p>
             </CardContent>
             <CardFooter>
               <Link
