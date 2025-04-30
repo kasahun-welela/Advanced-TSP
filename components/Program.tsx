@@ -66,7 +66,7 @@ export default function Program() {
             className="hover:shadow-lg transition-all duration-300"
           >
             <CardHeader className="relative">
-              <div className="absolute top-2 right-10 bg-white text-black px-3 py-1 rounded-full text-sm">
+              <div className="absolute top-2 right-10 bg-white text-black px-3 py-1 rounded text-sm">
                 {program.duration}
               </div>
               <Image
