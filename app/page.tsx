@@ -3,7 +3,7 @@ import Program from "@/components/Program";
 import Staff from "@/components/Staff";
 export default function Home() {
   return (
-    <div className="max-w-[90%] mx-auto">
+    <div className="max-w-[80%] mx-auto">
       <Services />
       <Program />
       <Staff />
