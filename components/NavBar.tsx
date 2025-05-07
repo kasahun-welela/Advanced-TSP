@@ -49,7 +49,7 @@ function NavBar() {
         <div className="flex justify-between items-center py-2 md:max-w-[80%] max-w-[90%] mx-auto">
           <Link href="/">
             {" "}
-            <Image src={logo} alt="E-learning logo" height={100} width={100} />
+            <Image src={logo} alt="E-learning logo" width={70} height={70} />
           </Link>
           <div className="flex items-center gap-8">
             <ul className="flex justify-end gap-6 items-center dark:text-white">
@@ -75,9 +75,9 @@ function NavBar() {
               </li>
               <li>
                 <Link
-                  href="/courses"
+                  href="/#courses"
                   className={`text-base md:text-lg font-medium ${
-                    path === "/courses" ? "text-primary font-semibold" : ""
+                    path === "#courses" ? "text-primary font-semibold" : ""
                   } hover:font-semibold hover:text-primary transition-all duration-200`}
                 >
                   Courses
@@ -191,9 +191,9 @@ function NavBar() {
                 <li>
                   <Link
                     className={`${
-                      path === "/courses" ? "text-primary font-semibold" : ""
+                      path === "/#courses" ? "text-primary font-semibold" : ""
                     } hover:text-primary`}
-                    href="/courses"
+                    href="/#courses"
                     onClick={closeMenu}
                   >
                     Courses

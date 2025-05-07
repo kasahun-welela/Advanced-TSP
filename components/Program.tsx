@@ -48,7 +48,7 @@ export default function Program() {
     },
   ];
   return (
-    <section className="py-16">
+    <section className="py-16" id="courses">
       <h1 className="text-xl md:text-2xl font-bold  my-3  text-primary">
         Explore Our Programs
       </h1>
