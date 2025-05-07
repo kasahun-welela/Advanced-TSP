@@ -7,15 +7,15 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Company Details */}
           <div className="space-y-4 col-span-2 md:col-span-1">
-            <h3 className="text-xl font-bold">E-learning</h3>
-            <p className="text-gray-400">
+            <h3 className="text-xl md:text-2xl font-bold">E-learning</h3>
+            <p className="text-gray-400 md:text-xl">
               Top learning experiences that create more talent in the world.
             </p>
             <div className="flex space-x-4">
               <Link href="#" className="text-gray-400 hover:text-white">
                 <span className="sr-only">Email</span>
                 <svg
-                  className="h-6 w-6"
+                  className="h-6 w-6 md:h-8 md:w-8"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -26,7 +26,7 @@ export default function Footer() {
               <Link href="#" className="text-gray-400 hover:text-white">
                 <span className="sr-only">Phone</span>
                 <svg
-                  className="h-6 w-6"
+                  className="h-6 w-6 md:h-8 md:w-8"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -38,8 +38,8 @@ export default function Footer() {
 
           {/* Products */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold">Products</h3>
-            <ul className="space-y-2">
+            <h3 className="text-xl md:text-2xl font-bold">Products</h3>
+            <ul className="space-y-2 md:text-xl">
               <li>
                 <Link href="#" className="text-gray-400 hover:text-white">
                   Product 1
@@ -65,8 +65,8 @@ export default function Footer() {
 
           {/* Company Links */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold">Company</h3>
-            <ul className="space-y-2">
+            <h3 className="text-xl md:text-2xl font-bold">Company</h3>
+            <ul className="space-y-2 md:text-xl">
               <li>
                 <Link href="#" className="text-gray-400 hover:text-white">
                   About Us
@@ -92,8 +92,8 @@ export default function Footer() {
 
           {/* Social Media */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold">Follow Us</h3>
-            <ul className="space-y-2">
+            <h3 className="text-xl md:text-2xl font-bold">Follow Us</h3>
+            <ul className="space-y-2 md:text-xl">
               <li>
                 <Link href="#" className="text-gray-400 hover:text-white">
                   Facebook
@@ -119,8 +119,8 @@ export default function Footer() {
 
           {/* Legal */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold">Legal</h3>
-            <ul className="space-y-2">
+            <h3 className="text-xl md:text-2xl font-bold">Legal</h3>
+            <ul className="space-y-2 md:text-xl">
               <li>
                 <Link href="#" className="text-gray-400 hover:text-white">
                   Privacy Policy

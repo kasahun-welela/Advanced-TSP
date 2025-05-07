@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section className="py-12 md:py-24">
+    <section className="py-12 md:py-24 mt-16">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div className="space-y-8">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight capitalize">
