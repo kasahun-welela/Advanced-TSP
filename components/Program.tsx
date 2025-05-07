@@ -56,8 +56,9 @@ export default function Program() {
         our most popular programs
       </p>
       <p className="my-3   md:text-xl text-muted-foreground">
-        Let's join our famous class, the knowledge provided will definitely be
-        useful for you.
+        {
+          "Let's join our famous class, the knowledge provided will definitely be useful for you. "
+        }
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {programs.map((program) => (

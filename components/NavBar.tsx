@@ -100,7 +100,7 @@ function NavBar() {
                     path === "/faq" ? "text-primary font-semibold" : ""
                   } hover:font-semibold hover:text-primary transition-all duration-200`}
                 >
-                  FAQ's
+                  {"FAQ's"}
                 </Link>
               </li>
             </ul>
@@ -218,7 +218,7 @@ function NavBar() {
                     href="/faq"
                     onClick={closeMenu}
                   >
-                    FAQ's
+                    {"FAQ's"}
                   </Link>
                 </li>
               </ul>
