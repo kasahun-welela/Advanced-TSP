@@ -15,13 +15,17 @@ import {
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const formSchema = z.object({
-  firstName: z.string().min(3, {
-    message: "First name must be at least 3 characters.",
+  name: z.string().min(3, {
+    message: "Name must be at least 3 characters.",
   }),
-  lastName: z.string().min(3, {
-    message: "Last name must be at least 3 characters.",
+  phone: z.string().min(10, {
+    message: "Phone number must be at least 10 characters.",
   }),
   email: z.string().email({
     message: "Please enter a valid email address.",
@@ -32,18 +36,42 @@ const formSchema = z.object({
 });
 
 export default function CreateAccount() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      name: "",
+      phone: "",
       email: "",
       password: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      setIsLoading(true);
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+        values
+      );
+      console.log("res =>", response);
+      if (response.data.success) {
+        toast.success("Account created successfully!");
+        router.push("/signin");
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.errors?.[0]?.msg || "Something went wrong";
+        toast.error(errorMessage);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -71,13 +99,13 @@ export default function CreateAccount() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
-                name="firstName"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>First Name</FormLabel>
+                    <FormLabel>Full Name</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter your first name"
+                        placeholder="Enter your name"
                         {...field}
                         className="h-12 px-4 text-base bg-muted"
                       />
@@ -89,13 +117,13 @@ export default function CreateAccount() {
 
               <FormField
                 control={form.control}
-                name="lastName"
+                name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Last Name</FormLabel>
+                    <FormLabel>Phone Number</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter your last name"
+                        placeholder="Enter your phone number"
                         {...field}
                         className="h-12 px-4 text-base bg-muted"
                       />
@@ -142,8 +170,12 @@ export default function CreateAccount() {
                 )}
               />
 
-              <Button type="submit" className="w-full h-12 text-base">
-                Create Account
+              <Button
+                type="submit"
+                className="w-full h-12 text-base"
+                disabled={isLoading}
+              >
+                {isLoading ? "Creating Account..." : "Create Account"}
               </Button>
 
               <div className="text-center text-sm">

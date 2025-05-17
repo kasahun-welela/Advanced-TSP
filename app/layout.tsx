@@ -4,6 +4,7 @@ import "./globals.css";
 import Footer from "@/components/Footer";
 import NavBar from "@/components/NavBar";
 import "remixicon/fonts/remixicon.css";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,7 @@ export default function RootLayout({
         {isUserLogged && <NavBar />}
         {children}
         <Footer />
+        <Toaster position="top-right" />
       </body>
     </html>
   );
