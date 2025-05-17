@@ -15,6 +15,10 @@ import {
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { login } from "@/app/actions/auth";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -26,6 +30,9 @@ const formSchema = z.object({
 });
 
 export default function SignIn() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -34,8 +41,21 @@ export default function SignIn() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      setIsLoading(true);
+      const result = await login(values);
+      console.log("result", result);
+      if (!result.success) {
+        toast.error(result.error);
+      } else if (result.redirectTo) {
+        router.push(result.redirectTo);
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -124,12 +144,16 @@ export default function SignIn() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full h-12 text-base">
-                Sign In
+              <Button
+                type="submit"
+                className="w-full h-12 text-base"
+                disabled={isLoading}
+              >
+                {isLoading ? "Signing in..." : "Sign In"}
               </Button>
 
               <div className="text-center text-sm">
-                {"Don't have an account?"}
+                {"Don't have an account?"}{" "}
                 <Link
                   href="/create-account"
                   className="text-primary hover:text-primary/80 font-medium"
