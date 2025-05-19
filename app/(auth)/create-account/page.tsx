@@ -13,7 +13,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import axios from "axios";
@@ -84,6 +83,9 @@ export default function CreateAccount() {
   return (
     <div className="min-h-screen flex justify-center items-center p-2">
       <Card className="w-full max-w-md">
+        <div className="flex justify-center">
+          <i className="ri-user-add-line text-4xl text-primary p-4 rounded-full bg-primary/10"></i>
+        </div>
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold">Create Account</CardTitle>
           <CardDescription className="mt-2">
