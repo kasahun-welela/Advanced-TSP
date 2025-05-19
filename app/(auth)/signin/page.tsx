@@ -19,6 +19,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { login } from "@/app/actions/auth";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -59,26 +66,15 @@ export default function SignIn() {
   }
 
   return (
-    <div className="min-h-screen flex">
-      <div className="hidden lg:block lg:w-8/12 relative">
-        <Image
-          src="/login-image.png"
-          alt="Login"
-          fill
-          className="object-fill"
-          priority
-        />
-      </div>
-
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md space-y-8">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold">Welcome Back</h1>
-            <p className="text-gray-500 mt-2">
-              Please enter your details to sign in
-            </p>
-          </div>
-
+    <div className="min-h-screen flex justify-center items-center p-2">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
+          <CardDescription className="mt-2">
+            Please enter your details to sign in
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
@@ -163,8 +159,8 @@ export default function SignIn() {
               </div>
             </form>
           </Form>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

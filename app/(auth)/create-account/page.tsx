@@ -19,6 +19,13 @@ import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 
 const formSchema = z.object({
   name: z.string().min(3, {
@@ -75,26 +82,15 @@ export default function CreateAccount() {
   }
 
   return (
-    <div className="min-h-screen flex">
-      <div className="hidden lg:block lg:w-8/12 relative">
-        <Image
-          src="/login-image.png"
-          alt="Create Account"
-          fill
-          className="object-fill"
-          priority
-        />
-      </div>
-
-      <div className="w-full lg:w-4/12 flex items-center justify-center p-8">
-        <div className="w-full max-w-md space-y-8">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold">Create Account</h1>
-            <p className="text-gray-500 mt-2">
-              Please fill in your details to create an account
-            </p>
-          </div>
-
+    <div className="min-h-screen flex justify-center items-center p-2">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl font-bold">Create Account</CardTitle>
+          <CardDescription className="mt-2">
+            Please fill your details to create an account
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
@@ -189,8 +185,8 @@ export default function CreateAccount() {
               </div>
             </form>
           </Form>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
