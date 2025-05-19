@@ -25,7 +25,7 @@ export default function DashboardPage() {
   ];
   return (
     <>
-      <DashboardHeader />
+      <DashboardHeader previousPage="Dashboard" currentPage="Programs" />
       <div className="md:max-w-[80%] max-w-[90%] mx-auto md:ml-12">
         <h1 className="text-2xl font-bold">Current Programs</h1>
         {currentProgram.map((program) => (
