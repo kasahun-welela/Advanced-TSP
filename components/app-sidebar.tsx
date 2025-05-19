@@ -43,7 +43,7 @@ const data = {
       items: [
         {
           title: "My Course",
-          url: "#",
+          url: "/dashboard",
         },
       ],
     },

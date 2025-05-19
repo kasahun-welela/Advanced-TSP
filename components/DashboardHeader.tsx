@@ -11,7 +11,13 @@ import {
   BreadcrumbSeparator,
 } from "./ui/breadcrumb";
 
-function DashboardHeader() {
+function DashboardHeader({
+  previousPage,
+  currentPage,
+}: {
+  previousPage: string;
+  currentPage: string;
+}) {
   return (
     <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
       <div className="flex items-center gap-2 px-4">
@@ -23,11 +29,11 @@ function DashboardHeader() {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href="#">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="#">{previousPage}</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator className="hidden md:block" />
             <BreadcrumbItem>
-              <BreadcrumbPage>Overview</BreadcrumbPage>
+              <BreadcrumbPage>{currentPage}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
