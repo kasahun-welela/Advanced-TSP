@@ -59,6 +59,7 @@ export default function SignIn() {
       }
     } catch (error) {
       toast.error("An unexpected error occurred");
+      console.log("error", error);
     } finally {
       setIsLoading(false);
     }
