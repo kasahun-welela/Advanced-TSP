@@ -9,6 +9,7 @@ import DashboardHeader from "@/components/DashboardHeader";
 export default function DashboardPage() {
   const currentProgram = [
     {
+      id: "001",
       title: "Full Stack Web Development",
       classDate: "10th May 2025",
       duration: "6 months",
@@ -16,6 +17,7 @@ export default function DashboardPage() {
       img: fullStack,
     },
     {
+      id: "002",
       title: "MuleSoft",
       classDate: "10th May 2025",
       duration: "3 months",
@@ -31,7 +33,7 @@ export default function DashboardPage() {
         {currentProgram.map((program) => (
           <Card
             className="my-4 hover:shadow-lg transition-all duration-300"
-            key={program.title}
+            key={program.id}
           >
             <div className="flex items-start gap-2 md:gap-4 px-3 ">
               <div className="flex items-center justify-center   ">
