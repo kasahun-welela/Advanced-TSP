@@ -9,7 +9,7 @@ import React from "react";
 
 export default function WeekCheckList() {
   return (
-    <Accordion type="single" collapsible className="px-3 py-2 shadow-sm mx-2">
+    <Accordion type="single" collapsible className="px-3  shadow-sm mx-2">
       <AccordionItem value="item-1">
         <AccordionTrigger className="md:text-xl text-lg hover:text-primary transition-all duration-300">
           <span className="flex items-center gap-2">

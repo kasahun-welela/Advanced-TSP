@@ -15,6 +15,28 @@ import VideoComponent from "@/components/VideoComponent";
 import WeekCheckList from "@/components/WeekCheckList";
 function page() {
   const { phaseID } = useParams();
+  const weeks = [
+    {
+      week: 1,
+      title: "Introduction to Html",
+      video: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    },
+    {
+      week: 2,
+      title: "Introduction to CSS",
+      video: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    },
+    {
+      week: 3,
+      title: "Introduction to JavaScript",
+      video: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    },
+    {
+      week: 4,
+      title: "Review Session",
+      video: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    },
+  ];
   return (
     <>
       <DashboardHeader
@@ -42,19 +64,18 @@ function page() {
                 collapsible
                 className="w-full shadow-sm px-2"
               >
-                <AccordionItem value="item-1">
-                  <AccordionTrigger className="text-lg md:text-xl hover:text-primary transition-all duration-300">
-                    Week 1: Introduction to HTML, CSS and JavaScript
-                  </AccordionTrigger>
-                  <AccordionContent className="flex flex-col gap-4">
-                    {/* week component */}
-                    <WeekComponent />
-                    {/* video component */}
-                    <VideoComponent />
-                    {/* week checklist */}
-                    <WeekCheckList />
-                  </AccordionContent>
-                </AccordionItem>
+                {weeks.map((week) => (
+                  <AccordionItem key={week.week} value={`item-${week.week}`}>
+                    <AccordionTrigger className="text-lg md:text-xl hover:text-primary transition-all duration-300">
+                      Week {week.week}: {week.title}
+                    </AccordionTrigger>
+                    <AccordionContent className="flex flex-col gap-4">
+                      <WeekComponent />
+                      <VideoComponent />
+                      <WeekCheckList />
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
               </Accordion>
             </CardContent>
           </Card>
