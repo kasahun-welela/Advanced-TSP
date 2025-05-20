@@ -59,7 +59,7 @@ function page() {
               Full Stack Web Development Course Phases
             </CardTitle>
           </CardHeader>
-          <CardContent className="w-full">
+          <CardContent className="">
             {coursePhase.map((phase) => (
               <div key={phase.title} className="my-4">
                 <CardComponent
