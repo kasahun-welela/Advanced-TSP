@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/accordion";
 import WeekComponent from "@/components/WeekComponent";
 import VideoComponent from "@/components/VideoComponent";
-
+import WeekCheckList from "@/components/WeekCheckList";
 function page() {
   const { phaseID } = useParams();
   return (
@@ -29,7 +29,7 @@ function page() {
               <CardTitle className="text-2xl font-bold">
                 Phase 1: HTML, CSS, and JavaScript
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="md:text-lg">
                 Master the fundamentals of web development with HTML5 for
                 structure, CSS3 for styling and responsive design, and
                 JavaScript for interactivity. Build responsive layouts, create
@@ -43,15 +43,16 @@ function page() {
                 className="w-full shadow-sm px-2"
               >
                 <AccordionItem value="item-1">
-                  <AccordionTrigger>
+                  <AccordionTrigger className="text-lg md:text-xl hover:text-primary transition-all duration-300">
                     Week 1: Introduction to HTML, CSS and JavaScript
                   </AccordionTrigger>
                   <AccordionContent className="flex flex-col gap-4">
                     {/* week component */}
                     <WeekComponent />
-
                     {/* video component */}
                     <VideoComponent />
+                    {/* week checklist */}
+                    <WeekCheckList />
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
