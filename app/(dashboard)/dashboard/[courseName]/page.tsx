@@ -5,7 +5,7 @@ import { Card, CardTitle, CardHeader, CardContent } from "@/components/ui/card";
 import React from "react";
 import { usePathname } from "next/navigation";
 
-function page() {
+function Page() {
   const pathname = usePathname();
   const coursePhase = [
     {
@@ -77,4 +77,4 @@ function page() {
   );
 }
 
-export default page;
+export default Page;

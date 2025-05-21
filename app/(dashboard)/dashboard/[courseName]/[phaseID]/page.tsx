@@ -3,7 +3,6 @@ import DashboardHeader from "@/components/DashboardHeader";
 import { CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { CardHeader } from "@/components/ui/card";
 import { Card } from "@/components/ui/card";
-import { useParams } from "next/navigation";
 import {
   Accordion,
   AccordionContent,
@@ -14,7 +13,6 @@ import WeekComponent from "@/components/WeekComponent";
 import VideoComponent from "@/components/VideoComponent";
 import WeekCheckList from "@/components/WeekCheckList";
 function page() {
-  const { phaseID } = useParams();
   const weeks = [
     {
       week: 1,
