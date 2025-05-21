@@ -6,7 +6,7 @@ import React from "react";
 import { usePathname } from "next/navigation";
 
 function Page() {
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
   const coursePhase = [
     {
       phase: 1,
@@ -44,6 +44,11 @@ function Page() {
       link: `${pathname}/phase-5`,
     },
   ];
+
+  if (!pathname) {
+    return null; // or a loading state
+  }
+
   return (
     <>
       <DashboardHeader
