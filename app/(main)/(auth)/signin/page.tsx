@@ -51,7 +51,6 @@ export default function SignIn() {
     try {
       setIsLoading(true);
       const result = await login(values);
-      console.log("result", result);
       if (!result.success) {
         toast.error(result.error);
       } else if (result.redirectTo) {

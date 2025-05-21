@@ -1,5 +1,7 @@
 "use server"
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import axios from "axios";
 
 export async function login(formData: { email: string; password: string }) {
   try {
@@ -67,3 +69,31 @@ export async function login(formData: { email: string; password: string }) {
     };
   }
 }
+
+export async function logout() {
+  try {
+    // Call the API to clear the session on the server
+    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {}, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      withCredentials: true, // This ensures cookies are sent with the request
+    });
+
+    // Clear local cookies
+    const cookieStore = await cookies();
+    cookieStore.delete("accessToken");
+    cookieStore.delete("refreshToken");
+    cookieStore.delete("user");
+    
+    redirect("/");
+  } catch (error) {
+    console.error('Logout error:', error);
+    const cookieStore = await cookies();
+    cookieStore.delete("accessToken");
+    cookieStore.delete("refreshToken");
+    cookieStore.delete("user");
+    redirect("/");
+  }
+}
+
