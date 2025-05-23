@@ -27,9 +27,11 @@ import {
 } from "@/components/ui/sidebar";
 import { logout, getUserProfileDetails } from "@/app/actions/auth";
 import { useState, useEffect } from "react";
+import { UserProfile } from "@/types/user";
+
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -37,7 +39,6 @@ export function NavUser() {
       try {
         const user = await getUserProfileDetails();
         setProfile(user);
-        console.log("profile", profile);
       } catch (error) {
         console.error("Error fetching user profile:", error);
       } finally {
@@ -62,10 +63,12 @@ export function NavUser() {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
-                  src={profile?.user?.avatar}
+                  src={profile?.user?.initials}
                   alt={profile?.user?.name}
                 />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">
+                  {profile?.user?.initials || "CN"}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
@@ -88,10 +91,12 @@ export function NavUser() {
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage
-                    src={profile?.user?.avatar}
+                    src={profile?.user?.initials}
                     alt={profile?.user?.name}
                   />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {profile?.user?.initials || "CN"}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">

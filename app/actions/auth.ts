@@ -67,14 +67,14 @@ export async function logout() {
     cookieStore.delete("refreshToken");
     cookieStore.delete("user");
     
-    redirect("/");
+    redirect("/signin");
   } catch (error) {
     console.error('Logout error:', error);
     const cookieStore = await cookies();
     cookieStore.delete("accessToken");
     cookieStore.delete("refreshToken");
     cookieStore.delete("user");
-    redirect("/");
+    redirect("/signin");
   }
 }
 
@@ -93,10 +93,11 @@ export async function forgotPassword(email: string) {
       success: true,
       message: response.data.message,
     };
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "An error occurred";
     return {
       success: false,
-      error: "Something went wrong. Please try again.",
+      error: errorMessage,
     };
   }
 }

@@ -24,6 +24,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { forgotPassword } from "@/app/actions/auth";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -33,6 +34,7 @@ const formSchema = z.object({
 
 export default function ForgotPassword() {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,15 +47,16 @@ export default function ForgotPassword() {
     try {
       setIsLoading(true);
       const result = await forgotPassword(values.email);
-
-      if (result.success) {
-        toast.success(result.message);
-        form.reset();
-      } else {
+      if (!result.success) {
         toast.error(result.error);
+      } else {
+        toast.success(result.message);
+        router.push("/signin");
       }
-    } catch (error) {
-      toast.error("Something went wrong. Please try again.");
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "An unexpected error occurred";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -68,8 +71,8 @@ export default function ForgotPassword() {
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold">Forgot Password</CardTitle>
           <CardDescription className="mt-2">
-            Enter your email address and we'll send you a link to reset your
-            password
+            Enter your email address and we&apos;ll send you a link to reset
+            your password
           </CardDescription>
         </CardHeader>
         <CardContent>
