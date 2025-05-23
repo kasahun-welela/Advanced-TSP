@@ -51,6 +51,7 @@ export default function SignIn() {
     try {
       setIsLoading(true);
       const result = await login(values);
+      console.log("result", result);
       if (!result.success) {
         toast.error(result.error);
       } else if (result.redirectTo) {
@@ -66,7 +67,7 @@ export default function SignIn() {
 
   return (
     <div className="min-h-screen flex justify-center items-center p-2">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md md:mt-24">
         <div className="flex justify-center">
           <i className="ri-user-line text-4xl text-primary p-4 rounded-full bg-primary/10"></i>
         </div>
