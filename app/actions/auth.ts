@@ -1,22 +1,12 @@
 "use server"
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import axios from "axios";
+import axiosInstance from "@/lib/axios";
 
 export async function login(formData: { email: string; password: string }) {
   try {
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
+    const response = await axiosInstance.post("/auth/login", formData);
     const data = response.data;
-    console.log(data);
 
     if (!data.success) {
       return {
@@ -70,15 +60,8 @@ export async function login(formData: { email: string; password: string }) {
 
 export async function logout() {
   try {
-    // Call the API to clear the session on the server
-    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {}, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      withCredentials: true, // This ensures cookies are sent with the request
-    });
-
-    // Clear local cookies
+    await axiosInstance.post("/auth/logout");
+    
     const cookieStore = await cookies();
     cookieStore.delete("accessToken");
     cookieStore.delete("refreshToken");
@@ -97,10 +80,7 @@ export async function logout() {
 
 export async function forgotPassword(email: string) {
   try {
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/forgot-password`,
-      { email }
-    );
+    const response = await axiosInstance.post("/auth/forgot-password", { email });
 
     if (!response.data.success) {
       return {
@@ -120,4 +100,10 @@ export async function forgotPassword(email: string) {
     };
   }
 }
+
+export async function getUserProfileDetails() {
+  const response = await axiosInstance.get("/auth/me");
+  return response.data;
+}
+
 
