@@ -5,15 +5,18 @@ import axios from "axios";
 
 export async function login(formData: { email: string; password: string }) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    const data = await response.json();
+    const data = response.data;
+    console.log(data);
 
     if (!data.success) {
       return {
@@ -46,22 +49,17 @@ export async function login(formData: { email: string; password: string }) {
         maxAge: 7 * 24 * 60 * 60,
       });
 
-       if (data.user.roles.includes("student")) {
+      if (data.user.roles.includes("student")) {
         return { success: true, redirectTo: "/dashboard" };
       } else {
         return { success: true, redirectTo: "/admin" };
       }
-    
-    }
-    else
-    {
-         return {
+    } else {
+      return {
         success: false,
         error: "Invalid server response: Missing tokens",
       };
     }
-
-    
   } catch (error) {
     return {
       success: false,
@@ -94,6 +92,32 @@ export async function logout() {
     cookieStore.delete("refreshToken");
     cookieStore.delete("user");
     redirect("/");
+  }
+}
+
+export async function forgotPassword(email: string) {
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/forgot-password`,
+      { email }
+    );
+
+    if (!response.data.success) {
+      return {
+        success: false,
+        error: response.data.errors?.[0]?.msg || "Failed to send reset link",
+      };
+    }
+
+    return {
+      success: true,
+      message: response.data.message,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: "Something went wrong. Please try again.",
+    };
   }
 }
 
