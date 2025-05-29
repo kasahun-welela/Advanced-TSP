@@ -1,6 +1,6 @@
 "use server";
 
-import { CreateCourse } from "@/interfaces";
+import { CreateCourse, Course } from "@/interfaces";
 import axiosInstance from "@/lib/axios";
 
 export async function createCourse(formData: CreateCourse) {
@@ -66,6 +66,22 @@ export async function getCourse(courseId: string) {
     return {
       success: false,
       error: error.response?.data?.message || error.message || "Failed to fetch course"
+    };
+  }
+}
+
+export async function updateCourse(courseId: string, formData: Partial<Course>) {
+  try {
+    const res = await axiosInstance.put(`/courses/${courseId}`, formData);
+    return {
+      success: true,
+      data: res.data
+    };
+  } catch (error: any) {
+    console.error("Update course error:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || error.message || "Failed to update course"
     };
   }
 }

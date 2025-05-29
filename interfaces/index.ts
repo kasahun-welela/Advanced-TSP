@@ -8,6 +8,7 @@ export interface Course {
   duration_months: number;
   course_type: string;
   delivery_method: string;
+  difficulty_level: string;
 }
 
 export interface CreateCourse {

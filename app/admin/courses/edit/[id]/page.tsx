@@ -2,17 +2,19 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import axios from "axios";
+import { getCourse, updateCourse } from "@/app/actions/course";
+import { Course } from "@/interfaces";
 
 export default function EditCoursePage() {
   const router = useRouter();
   const params = useParams();
   const courseId = params?.id as string;
-  const [course, setCourse] = useState<any>(null);
+  const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error" | "">("");
+
   useEffect(() => {
     if (!courseId) {
       console.error("Course ID is missing in URL");
@@ -20,13 +22,11 @@ export default function EditCoursePage() {
     }
     const fetchCourse = async () => {
       try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/courses/${courseId}`
-        );
-        if (res.data.success && res.data.data?.course) {
-          setCourse(res.data.data.course);
+        const res = await getCourse(courseId);
+        if (res.success && res.data) {
+          setCourse(res.data);
         } else {
-          setMessage(res.data.message || "Failed to fetch course.");
+          setMessage(res.error || "Failed to fetch course.");
           setMessageType("error");
         }
       } catch (err: any) {
@@ -42,22 +42,28 @@ export default function EditCoursePage() {
     };
     fetchCourse();
   }, [courseId]);
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
     const { name, value } = e.target;
-    setCourse((prev: any) => ({
-      ...prev,
-      [name]:
-        name === "price" || name === "duration_months" ? Number(value) : value,
-    }));
+    setCourse((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        [name]:
+          name === "price" || name === "duration_months"
+            ? Number(value)
+            : value,
+      };
+    });
   };
+
   const showMessage = (msg: string, type: "success" | "error" = "error") => {
     setMessage(msg);
     setMessageType(type);
-    // Scroll to top so the user can see the message
     window.scrollTo({ top: 0, behavior: "smooth" });
 
     setTimeout(() => {
@@ -65,8 +71,11 @@ export default function EditCoursePage() {
       setMessageType("");
     }, 6000);
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!course) return;
+
     if (
       !course.title ||
       typeof course.title !== "string" ||
@@ -82,21 +91,16 @@ export default function EditCoursePage() {
     setSaving(true);
     try {
       console.log("Updating course with payload:", course);
-      const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/courses/${courseId}`,
-        course
-      );
+      const res = await updateCourse(courseId, course);
 
-      if (res.data.success) {
+      if (res.success) {
         showMessage("Information updated successfully.", "success");
 
         setTimeout(() => {
           router.push("/admin/courses/allCourse");
         }, 2000);
       } else {
-        const errMsg =
-          res.data.message || res.data.error || "Unknown server error";
-        showMessage(`Update failed. Reason: ${errMsg}`, "error");
+        showMessage(`Update failed. Reason: ${res.error}`, "error");
       }
     } catch (err: any) {
       showMessage(
@@ -107,6 +111,7 @@ export default function EditCoursePage() {
       setSaving(false);
     }
   };
+
   if (loading)
     return (
       <div className="flex flex-col items-center justify-center h-[60vh]">
