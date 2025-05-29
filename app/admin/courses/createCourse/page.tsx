@@ -3,15 +3,14 @@
 import { useState, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Book } from "lucide-react";
-import axios from "axios";
-
+import axiosInstance from "@/lib/axios";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-
+import { createCourse } from "@/app/actions/course";
 export default function CreateCoursePage() {
   const [formData, setFormData] = useState({
     title: "",
@@ -102,18 +101,11 @@ export default function CreateCoursePage() {
     }
 
     try {
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/courses`,
-        formData
-      );
+      const res = await createCourse(formData);
 
-      if (!res.data.success) {
-        console.error("Course creation failed:", res.data);
-        const errorMsg =
-          res.data.message ||
-          res.data.error ||
-          `Course creation failed. Server responded with status ${res.status}.`;
-        throw new Error(errorMsg);
+      if (!res.success) {
+        console.error("Course creation failed:", res.error);
+        throw new Error(res.error);
       }
 
       toast.success("Course Created", {
