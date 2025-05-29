@@ -4,18 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Pencil, Trash2, FilePlus, FileText } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getAllCourses, deleteCourse, getCourse } from "@/app/actions/course";
-
-interface Course {
-  _id: string;
-  title: string;
-  description: string;
-  thumbnail: string;
-  price: number;
-  status: string;
-  duration_months: number;
-  course_type: string;
-  delivery_method: string;
-}
+import { Course } from "@/interfaces";
 
 const AllCoursesPage = () => {
   const [courses, setCourses] = useState<Course[]>([]);
