@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Pencil, Trash2, FilePlus, FileText } from "lucide-react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import { getAllCourses, deleteCourse, getCourse } from "@/app/actions/course";
 
 interface Course {
   _id: string;
@@ -37,15 +37,13 @@ const AllCoursesPage = () => {
     const fetchCourses = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/courses`
-        );
-        if (res.data.success && Array.isArray(res.data.data)) {
-          setCourses(res.data.data);
+        const res = await getAllCourses();
+        if (res.success && Array.isArray(res.data)) {
+          setCourses(res.data);
         } else {
-          showAlert("Failed to load courses.");
+          showAlert(res.error || "Failed to load courses.");
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Fetch error:", err);
         showAlert("An error occurred while fetching courses.");
       } finally {
@@ -60,17 +58,13 @@ const AllCoursesPage = () => {
     setDeleting(courseId);
 
     try {
-      const res = await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/courses/${courseId}`
-      );
+      const res = await deleteCourse(courseId);
 
-      if (res.status === 200 && res.data.success) {
+      if (res.success) {
         setCourses((prev) => prev.filter((course) => course._id !== courseId));
         showAlert("Course deleted successfully.", "success");
       } else {
-        const message =
-          res.data.message || res.data.error || "Unknown server error";
-        showAlert(`Failed to delete the course. Reason: ${message}`);
+        showAlert(`Failed to delete the course. Reason: ${res.error}`);
       }
     } catch (err: any) {
       console.error("Delete error:", err);
@@ -82,17 +76,13 @@ const AllCoursesPage = () => {
 
   const handleEdit = async (courseId: string) => {
     try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/courses/${courseId}`
-      );
+      const res = await getCourse(courseId);
 
-      if (res.data.success && res.data.data) {
-        localStorage.setItem("editCourse", JSON.stringify(res.data.data));
+      if (res.success && res.data) {
+        localStorage.setItem("editCourse", JSON.stringify(res.data));
         router.push(`/admin/courses/edit/${courseId}`);
       } else {
-        const message =
-          res.data.message || res.data.error || "Course not found";
-        showAlert(`Failed to fetch course data. Reason: ${message}`);
+        showAlert(`Failed to fetch course data. Reason: ${res.error}`);
       }
     } catch (err: any) {
       console.error("Edit fetch error:", err);
