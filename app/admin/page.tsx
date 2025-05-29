@@ -21,7 +21,7 @@ import Link from "next/link";
 import { LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-type Theme = "dark" | "light";
+// type Theme = "dark" | "light";
 type User = {
   id: string;
   name: string;
@@ -33,7 +33,7 @@ type User = {
   roles: string[];
 };
 export default function Dashboard() {
-  const [theme, setTheme] = useState<Theme>("dark");
+  // const [theme, setTheme] = useState<Theme>("dark");
   const [isLoading, setIsLoading] = useState(true);
   // const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -156,23 +156,7 @@ export default function Dashboard() {
     };
   }, []);
 
-  const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
-
-  // Formatting helpers with null checks
-  const formatTime = (date: Date | null) =>
-    date?.toLocaleTimeString("en-US", {
-      hour12: false,
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }) || "--:--:--";
-
-  const formatDate = (date: Date | null) =>
-    date?.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    }) || "Loading...";
+  // const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
 
   if (isLoading) {
     return (
@@ -192,7 +176,7 @@ export default function Dashboard() {
 
   return (
     <div
-      className={`${theme} min-h-screen bg-white text-gray-900 relative overflow-hidden`}
+      className={` min-h-screen bg-white text-gray-900 relative overflow-hidden`}
     >
       <canvas
         ref={canvasRef}
@@ -480,43 +464,6 @@ export default function Dashboard() {
 
 // Component Sub-sections
 
-function DashboardSection({
-  title,
-  icon: Icon,
-  children,
-  badge,
-  compact = false,
-}: {
-  title: string;
-  icon: LucideIcon;
-  children: React.ReactNode;
-  badge?: string;
-  compact?: boolean;
-}) {
-  return (
-    <Card className="bg-slate-900/50 border-slate-700/50 backdrop-blur-sm overflow-hidden">
-      <CardHeader
-        className={`${compact ? "pb-2" : "pb-3"} border-b border-slate-700/50`}
-      >
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-slate-100 flex items-center">
-            <Icon className="mr-2 h-5 w-5 text-green-500" />
-            {title}
-          </CardTitle>
-          {badge && (
-            <Badge
-              variant="outline"
-              className="bg-slate-800/50 text-blue-400 border-blue-500/50 text-xs"
-            >
-              {badge}
-            </Badge>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className={compact ? "p-4" : "p-6"}>{children}</CardContent>
-    </Card>
-  );
-}
 function SystemTimeCard({
   time,
   uptime,
@@ -605,16 +552,6 @@ function QuickActionsCard() {
   );
 }
 
-type ActionButtonProps = {
-  icon: LucideIcon; // or IconType if using react-icons
-  label: string;
-};
-const ActionButton: React.FC<ActionButtonProps> = ({ icon: Icon, label }) => (
-  <button className="flex items-center justify-center gap-2 px-4 py-2 bg-white text-black border border-gray-300 rounded hover:bg-gray-100">
-    <Icon className="h-5 w-5 text-green-500" />
-    {label}
-  </button>
-);
 function UserProfileCard(): JSX.Element | null {
   const [user, setUser] = useState<User | null>(null);
   const [localLoginTime, setLocalLoginTime] = useState<string>("");

@@ -29,8 +29,10 @@ export default function EditCoursePage() {
           setMessage(res.error || "Failed to fetch course.");
           setMessageType("error");
         }
-      } catch (err: any) {
-        setMessage(err.message || "Error fetching course.");
+      } catch (err: unknown) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Error fetching course.";
+        setMessage(errorMessage);
         setMessageType("error");
       } finally {
         setLoading(false);
@@ -102,11 +104,10 @@ export default function EditCoursePage() {
       } else {
         showMessage(`Update failed. Reason: ${res.error}`, "error");
       }
-    } catch (err: any) {
-      showMessage(
-        `Error updating course. Reason: ${err.message || err.toString()}`,
-        "error"
-      );
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Error updating course.";
+      showMessage(errorMessage, "error");
     } finally {
       setSaving(false);
     }

@@ -4,8 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import {
   Hexagon,
   Search,
-  Moon,
-  Sun,
   LogOut,
   BookOpen,
   Layers,
@@ -20,15 +18,15 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+// import {
+//   Tooltip,
+//   TooltipContent,
+//   TooltipProvider,
+//   TooltipTrigger,
+// } from "@/components/ui/tooltip";
 import { NavDropdown } from "@/components/layout/NavDropdown";
 import { NavSubItem } from "@/components/layout/NavSubItem";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function AdminLayout({
@@ -36,10 +34,9 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [theme, setTheme] = useState<"dark" | "light">("light");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const pathname = usePathname();
+  // const pathname = usePathname();
   const router = useRouter();
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -94,29 +91,29 @@ export default function AdminLayout({
     }
     animate();
   }, []);
-  const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
+  // const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-  const handleLogout = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(
-        "https://e-learning-mern-stack.onrender.com/api/auth/logout",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const data = await res.json();
-      if (data.success) {
-        localStorage.removeItem("token");
-        router.push("/login");
-      }
-    } catch (err) {
-      console.error("Logout error:", err);
-    }
-  };
+  // const handleLogout = async () => {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     const res = await fetch(
+  //       "https://e-learning-mern-stack.onrender.com/api/auth/logout",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //     const data = await res.json();
+  //     if (data.success) {
+  //       localStorage.removeItem("token");
+  //       router.push("/login");
+  //     }
+  //   } catch (err) {
+  //     console.error("Logout error:", err);
+  //   }
+  // };
   const renderFooter = () => (
     <footer className="mt-12 border-t border-gray-300 pt-10 pb-12 text-gray-600 text-sm">
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 px-4">
@@ -154,7 +151,7 @@ export default function AdminLayout({
     </footer>
   );
   return (
-    <div className={`${theme} min-h-screen bg-white text-black relative`}>
+    <div className={` min-h-screen bg-white text-black relative`}>
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full opacity-10"

@@ -10,14 +10,12 @@ export async function createCourse(formData: CreateCourse) {
       success: true,
       data: res.data,   
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Create course error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to create course";
     return {
       success: false,
-      error:
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to create course",
+      error: errorMessage
     };
   }
 }
@@ -29,11 +27,12 @@ export async function getAllCourses() {
       success: true,
       data: res.data.data
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Get courses error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to fetch courses";
     return {
       success: false,
-      error: error.response?.data?.message || error.message || "Failed to fetch courses"
+      error: errorMessage
     };
   }
 }
@@ -45,11 +44,12 @@ export async function deleteCourse(courseId: string) {
       success: true,
       data: res.data
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Delete course error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to delete course";
     return {
       success: false,
-      error: error.response?.data?.message || error.message || "Failed to delete course"
+      error: errorMessage
     };
   }
 }
@@ -61,11 +61,12 @@ export async function getCourse(courseId: string) {
       success: true,
       data: res.data.data
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Get course error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to fetch course";
     return {
       success: false,
-      error: error.response?.data?.message || error.message || "Failed to fetch course"
+      error: errorMessage
     };
   }
 }
@@ -77,11 +78,12 @@ export async function updateCourse(courseId: string, formData: Partial<Course>) 
       success: true,
       data: res.data
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Update course error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to update course";
     return {
       success: false,
-      error: error.response?.data?.message || error.message || "Failed to update course"
+      error: errorMessage
     };
   }
 }

@@ -69,14 +69,6 @@ export default function CreateChecklistPage() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleCreate = () => {
-    if (formData.course && formData.batch && formData.phase && formData.group) {
-      alert("Checklist Created!");
-    } else {
-      alert("Please fill in all fields.");
-    }
-  };
-
   const filteredStudents = students.filter(
     (student) =>
       student.course === formData.course &&

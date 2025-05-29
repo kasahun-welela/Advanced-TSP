@@ -32,7 +32,7 @@ const AllCoursesPage = () => {
         } else {
           showAlert(res.error || "Failed to load courses.");
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Fetch error:", err);
         showAlert("An error occurred while fetching courses.");
       } finally {
@@ -55,9 +55,13 @@ const AllCoursesPage = () => {
       } else {
         showAlert(`Failed to delete the course. Reason: ${res.error}`);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Delete error:", err);
-      showAlert(`Could not delete the course. Reason: ${err.message}`);
+      showAlert(
+        `Could not delete the course. Reason: ${
+          err instanceof Error ? err.message : "Unknown error"
+        }`
+      );
     } finally {
       setDeleting(null);
     }
@@ -73,9 +77,10 @@ const AllCoursesPage = () => {
       } else {
         showAlert(`Failed to fetch course data. Reason: ${res.error}`);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Edit fetch error:", err);
-      showAlert(`Could not load course. Reason: ${err.message}`);
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      showAlert(`Could not load course. Reason: ${errorMessage}`);
     }
   };
 
@@ -116,8 +121,8 @@ const AllCoursesPage = () => {
             >
               <div className="flex-1 w-full">
                 <h2 className="text-xl font-semibold mb-1">{course.title}</h2>
-                <p className="text-gray-600 text-sm mb-3">
-                  {course.description}
+                <p className="text-gray-500 text-sm">
+                  &ldquo;{course.description}&rdquo;
                 </p>
 
                 <div className="flex flex-wrap items-center gap-4 text-sm">
@@ -180,8 +185,8 @@ const AllCoursesPage = () => {
               </button>
             </div>
             <p className="text-gray-700 mb-6">
-              Are you sure you want to delete{" "}
-              <strong>"{selectedCourse.title}"</strong>?
+              Are you sure you want to delete
+              <strong>{selectedCourse.title}</strong>?
             </p>
             <div className="flex justify-end gap-4">
               <button

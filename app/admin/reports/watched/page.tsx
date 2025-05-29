@@ -39,7 +39,7 @@ export default function CreateWatchedPage() {
     topic: "",
   });
 
-  const [students, setStudents] = useState([
+  const students = [
     {
       name: "Rahel Adane",
       email: "rahelina24@gmail.com",
@@ -58,7 +58,7 @@ export default function CreateWatchedPage() {
       phase: "phase 1",
       group: "LS-1",
     },
-  ]);
+  ];
 
   const [checklistItems, setChecklistItems] = useState([
     { topic: "Introduction", status: "read" },
@@ -70,13 +70,13 @@ export default function CreateWatchedPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCreate = () => {
-    if (formData.course && formData.batch && formData.phase && formData.group) {
-      alert("Checklist Created!");
-    } else {
-      alert("Please fill in all fields.");
-    }
-  };
+  // const handleCreate = () => {
+  //   if (formData.course && formData.batch && formData.phase && formData.group) {
+  //     alert("Checklist Created!");
+  //   } else {
+  //     alert("Please fill in all fields.");
+  //   }
+  // };
 
   const filteredStudents = students.filter(
     (student) =>

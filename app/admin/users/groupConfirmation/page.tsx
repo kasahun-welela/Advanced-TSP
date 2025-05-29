@@ -1,16 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Users, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Users } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
-import { Input } from "@/components/ui/input"; // adjust the path if needed
 import { usePathname } from "next/navigation";
-
+import Image from "next/image";
 export default function GroupConfirmationPage() {
   const pathname = usePathname();
-
-  const [search, setSearch] = useState("");
   const [filters, setFilters] = useState({
     course: "",
     batch: "",
@@ -24,13 +21,15 @@ export default function GroupConfirmationPage() {
     { label: "Group Confirmation", path: "/dashboard/users/groupConfirmation" },
   ];
 
-  const handleFilterChange = (e: { target: { name: string; value: string } }) => {
+  const handleFilterChange = (e: {
+    target: { name: string; value: string };
+  }) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
   };
 
   return (
     <div className="p-6 bg-white text-gray-900 min-h-screen">
-            {/* Page Title */}
+      {/* Page Title */}
       <h1 className="text-2xl font-bold text-green-600 mb-6 flex items-center gap-2">
         <Users className="text-green-500" />
         Group Confirmation
@@ -65,7 +64,9 @@ export default function GroupConfirmationPage() {
           className="p-2 rounded border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
         >
           <option value="">Select Course</option>
-          <option value="Fullstack Web Application">Fullstack Web Application</option>
+          <option value="Fullstack Web Application">
+            Fullstack Web Application
+          </option>
           <option value="MuleSoft">MuleSoft</option>
           <option value="AWS">AWS</option>
           <option value="Database">Database</option>
@@ -122,7 +123,7 @@ export default function GroupConfirmationPage() {
             {/* Example Row */}
             <tr className="border-b border-gray-200 hover:bg-gray-50">
               <td className="p-2 flex items-center gap-2">
-                <img
+                <Image
                   src="/avatar.png"
                   className="w-8 h-8 rounded-full"
                   alt="avatar"

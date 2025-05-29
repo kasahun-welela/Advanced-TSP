@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import Image from "next/image";
 
 export default function ListUsersPage() {
   const [role, setRole] = useState("all");
@@ -68,38 +69,37 @@ export default function ListUsersPage() {
         List of Users
       </h1>
 
-     {/* Top Tabs */}
-<div className="flex flex-col md:flex-row md:items-center md:justify-between border-b pb-2 gap-4">
-  {/* Navigation Tabs */}
-  <div className="flex flex-wrap gap-4">
-    {tabs.map(tab => (
-      <Link
-        key={tab.path}
-        href={tab.path}
-        className={clsx(
-          "px-4 py-2 rounded-t text-sm font-medium",
-          pathname === tab.path
-            ? "bg-white text-green-600 border-b-2 border-green-600"
-            : "text-gray-600 hover:text-black"
-        )}
-      >
-        {tab.label}
-      </Link>
-    ))}
-  </div>
+      {/* Top Tabs */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b pb-2 gap-4">
+        {/* Navigation Tabs */}
+        <div className="flex flex-wrap gap-4">
+          {tabs.map((tab) => (
+            <Link
+              key={tab.path}
+              href={tab.path}
+              className={clsx(
+                "px-4 py-2 rounded-t text-sm font-medium",
+                pathname === tab.path
+                  ? "bg-white text-green-600 border-b-2 border-green-600"
+                  : "text-gray-600 hover:text-black"
+              )}
+            >
+              {tab.label}
+            </Link>
+          ))}
+        </div>
 
-  {/* Search Input (with spacing from top tabs) */}
-  <div className="relative w-full md:w-1/3 mt-2 md:mt-0">
-    <Input
-      type="text"
-      placeholder="Search students"
-      value={search}
-      onChange={e => setSearch(e.target.value)}
-    />
-    <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
-  </div>
-</div>
-
+        {/* Search Input (with spacing from top tabs) */}
+        <div className="relative w-full md:w-1/3 mt-2 md:mt-0">
+          <Input
+            type="text"
+            placeholder="Search students"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
+        </div>
+      </div>
 
       {/* Filter Controls */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 text-sm">
@@ -134,7 +134,6 @@ export default function ListUsersPage() {
             </SelectContent>
           </Select>
         </div>
-
       </div>
       {/* Total Users */}
       <div className="text-sm text-gray-600">Total Users: {totalUsers}</div>
@@ -147,8 +146,12 @@ export default function ListUsersPage() {
               <th className="text-left p-3 border-b border-gray-300">
                 Avatar / Name
               </th>
-              <th className="text-left p-3 border-b border-gray-300">Contact</th>
-              <th className="text-left p-3 border-b border-gray-300">Address</th>
+              <th className="text-left p-3 border-b border-gray-300">
+                Contact
+              </th>
+              <th className="text-left p-3 border-b border-gray-300">
+                Address
+              </th>
               <th className="text-left p-3 border-b border-gray-300">
                 Joined Date
               </th>
@@ -161,7 +164,7 @@ export default function ListUsersPage() {
                 className="border-b border-gray-200 hover:bg-gray-50 transition"
               >
                 <td className="p-3 flex items-center gap-2">
-                  <img
+                  <Image
                     src={user.avatar}
                     alt="avatar"
                     className="w-8 h-8 rounded-full"

@@ -3,7 +3,6 @@
 import { useState, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Book } from "lucide-react";
-import axiosInstance from "@/lib/axios";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { createCourse } from "@/app/actions/course";
+import Image from "next/image";
+
 export default function CreateCoursePage() {
   const [formData, setFormData] = useState({
     title: "",
@@ -54,7 +55,7 @@ export default function CreateCoursePage() {
       return;
     }
 
-    const img = new Image();
+    const img = new window.Image();
     img.src = URL.createObjectURL(file);
 
     img.onload = () => {
@@ -127,9 +128,9 @@ export default function CreateCoursePage() {
         delivery_method: "online",
       });
       setIconPreview("");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error occurred while creating course:", err);
-      setError(err.message || "Something went wrong.");
+      setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -190,7 +191,7 @@ export default function CreateCoursePage() {
               onChange={handleIconUpload}
             />
             {iconPreview && (
-              <img
+              <Image
                 src={iconPreview}
                 alt="Icon Preview"
                 className="mt-2 rounded border w-[60px] h-[60px] object-cover"

@@ -101,7 +101,7 @@ export default function WeeklyReportPage() {
     } else {
       setIndividualScores([]);
     }
-  }, [formData]);
+  }, [formData, groupScores]);
 
   const calculateColumn = (stepIndex: number) => {
     const updatedIndividuals = individualScores.map((student) => {
