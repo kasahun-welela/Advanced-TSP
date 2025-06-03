@@ -27,6 +27,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import ErrorMessage from "@/components/ErrorMessage";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const AllCoursesPage = () => {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -107,7 +108,28 @@ const AllCoursesPage = () => {
       </div>
 
       {loading ? (
-        <p className="text-gray-500">Loading courses...</p>
+        <div className="space-y-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="w-full">
+              <CardHeader>
+                <Skeleton className="h-6 w-1/3" />
+                <Skeleton className="h-4 w-2/3 mt-2" />
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap items-center gap-4">
+                  <Skeleton className="h-6 w-24" />
+                  <Skeleton className="h-6 w-24" />
+                  <Skeleton className="h-6 w-24" />
+                  <Skeleton className="h-6 w-24" />
+                </div>
+              </CardContent>
+              <CardFooter className="flex gap-4">
+                <Skeleton className="h-9 w-20" />
+                <Skeleton className="h-9 w-20" />
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
       ) : courses.length === 0 ? (
         <ErrorMessage message="No courses available." />
       ) : (
