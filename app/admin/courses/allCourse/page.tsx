@@ -14,22 +14,24 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import ErrorMessage from "@/components/ErrorMessage";
 
 const AllCoursesPage = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState<string | null>(null);
-  const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  const [alertType, setAlertType] = useState<"error" | "success">("error");
-  const [showModal, setShowModal] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const router = useRouter();
-
-  const showAlert = (message: string, type: "error" | "success" = "error") => {
-    setAlertMessage(message);
-    setAlertType(type);
-    setTimeout(() => setAlertMessage(null), 4000);
-  };
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -39,11 +41,11 @@ const AllCoursesPage = () => {
         if (res.success && Array.isArray(res.data)) {
           setCourses(res.data);
         } else {
-          showAlert(res.error || "Failed to load courses.");
+          toast.error(res.error || "Failed to load courses.");
         }
       } catch (err: unknown) {
         console.error("Fetch error:", err);
-        showAlert("An error occurred while fetching courses.");
+        toast.error("An error occurred while fetching courses.");
       } finally {
         setLoading(false);
       }
@@ -53,26 +55,25 @@ const AllCoursesPage = () => {
   }, [router]);
 
   const handleDelete = async (courseId: string) => {
-    setDeleting(courseId);
-
+    setLoading(true);
     try {
       const res = await deleteCourse(courseId);
 
       if (res.success) {
         setCourses((prev) => prev.filter((course) => course._id !== courseId));
-        showAlert("Course deleted successfully.", "success");
+        toast.success("Course deleted successfully.");
       } else {
-        showAlert(`Failed to delete the course. Reason: ${res.error}`);
+        toast.error(`Failed to delete the course. Reason: ${res.error}`);
       }
     } catch (err: unknown) {
       console.error("Delete error:", err);
-      showAlert(
+      toast.error(
         `Could not delete the course. Reason: ${
           err instanceof Error ? err.message : "Unknown error"
         }`
       );
     } finally {
-      setDeleting(null);
+      setLoading(false);
     }
   };
 
@@ -84,12 +85,12 @@ const AllCoursesPage = () => {
         localStorage.setItem("editCourse", JSON.stringify(res.data));
         router.push(`/admin/courses/edit/${courseId}`);
       } else {
-        showAlert(`Failed to fetch course data. Reason: ${res.error}`);
+        toast.error(`Failed to fetch course data. Reason: ${res.error}`);
       }
     } catch (err: unknown) {
       console.error("Edit fetch error:", err);
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
-      showAlert(`Could not load course. Reason: ${errorMessage}`);
+      toast.error(`Could not load course. Reason: ${errorMessage}`);
     }
   };
 
@@ -105,22 +106,10 @@ const AllCoursesPage = () => {
         </button>
       </div>
 
-      {alertMessage && (
-        <div
-          className={`mb-4 p-3 rounded text-sm ${
-            alertType === "error"
-              ? "bg-red-100 text-red-700"
-              : "bg-green-100 text-green-700"
-          }`}
-        >
-          {alertMessage}
-        </div>
-      )}
-
       {loading ? (
         <p className="text-gray-500">Loading courses...</p>
       ) : courses.length === 0 ? (
-        <p className="text-gray-500">No courses available.</p>
+        <ErrorMessage message="No courses available." />
       ) : (
         <div className="space-y-6">
           {courses.map((course) => (
@@ -161,70 +150,61 @@ const AllCoursesPage = () => {
                 </div>
               </CardContent>
               <CardFooter className="flex gap-4">
-                <button
-                  className="flex items-center text-blue-600 hover:underline gap-1"
+                <Button
+                  variant="outline"
+                  disabled={loading}
                   onClick={() => handleEdit(course._id)}
+                  className="flex items-center text-blue-600 hover:underline gap-1 disabled:opacity-50"
                 >
                   <Pencil size={14} /> Edit
-                </button>
+                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      disabled={loading}
+                      className="text-red-600 hover:underline gap-1 disabled:opacity-50"
+                    >
+                      <Trash2 size={14} />
+                      {loading ? "Deleting..." : "Delete"}
+                    </Button>
+                  </DialogTrigger>
 
-                <button
-                  disabled={deleting === course._id}
-                  onClick={() => {
-                    setSelectedCourse(course);
-                    setShowModal(true);
-                  }}
-                  className="flex items-center text-red-600 hover:underline gap-1 disabled:opacity-50"
-                >
-                  <Trash2 size={14} />
-                  {deleting === course._id ? "Deleting..." : "Delete"}
-                </button>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <span className="text-red-500">⚠️</span>
+                        Confirm Delete
+                      </DialogTitle>
+                      <DialogDescription>
+                        Are you sure you want to delete{" "}
+                        <strong>{course?.title} </strong> course?
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="flex gap-4">
+                      <DialogClose asChild>
+                        <Button type="button" variant="secondary">
+                          Close
+                        </Button>
+                      </DialogClose>
+                      <DialogClose asChild>
+                        <Button
+                          variant="destructive"
+                          disabled={loading}
+                          onClick={async () => {
+                            await handleDelete(course._id);
+                          }}
+                        >
+                          {loading ? "Deleting..." : "Delete"}
+                        </Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+                ;
               </CardFooter>
             </Card>
           ))}
-        </div>
-      )}
-
-      {/* Custom Delete Confirmation Modal */}
-      {showModal && selectedCourse && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <span className="text-red-500 text-xl">⚠️</span>
-                <h2 className="text-lg font-semibold text-gray-800">
-                  Confirm Delete
-                </h2>
-              </div>
-              <button
-                onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-600 text-xl font-bold"
-              >
-                &times;
-              </button>
-            </div>
-            <p className="text-gray-700 mb-6">
-              Are you sure you want to delete
-              <strong>{selectedCourse.title}</strong>?
-            </p>
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-100"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={async () => {
-                  await handleDelete(selectedCourse._id);
-                  setShowModal(false);
-                }}
-                className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
         </div>
       )}
     </div>
