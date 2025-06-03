@@ -96,6 +96,7 @@ export default function EditCoursePage() {
 
     try {
       const res = await updateCourse(courseId, values);
+
       if (res.success) {
         toast.success("Course updated successfully.");
         setTimeout(() => {
@@ -148,6 +149,14 @@ export default function EditCoursePage() {
             <Skeleton className="h-10 w-32" />
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (!form.getValues("title")) {
+    return (
+      <div className="max-w-4xl mx-auto p-8 bg-white shadow-md rounded-md mt-8">
+        <ErrorMessage message="Course not found or failed to load" />
       </div>
     );
   }
