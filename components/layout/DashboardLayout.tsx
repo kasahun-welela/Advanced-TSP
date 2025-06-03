@@ -28,6 +28,7 @@ import { NavDropdown } from "@/components/layout/NavDropdown";
 import { NavSubItem } from "@/components/layout/NavSubItem";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { logout } from "@/app/actions/auth";
 
 export default function AdminLayout({
   children,
@@ -214,38 +215,8 @@ export default function AdminLayout({
                 </AvatarFallback>
               </Avatar>
               <Button
-                onClick={async () => {
-                  try {
-                    const token = localStorage.getItem("token");
-
-                    if (!token) {
-                      router.replace("/");
-                      return;
-                    }
-                    const res = await fetch(
-                      "https://e-learning-mern-stack.onrender.com/api/auth/logout",
-                      {
-                        method: "POST",
-                        headers: {
-                          Authorization: `Bearer ${token}`,
-                          "Content-Type": "application/json",
-                        },
-                      }
-                    );
-
-                    if (!res.ok) {
-                      const text = await res.text();
-                      console.error("Logout failed with status:", res.status);
-                      console.error("Raw response text:", text);
-                      router.replace("/"); // Even on error, force redirect
-                      return;
-                    }
-                    localStorage.removeItem("token");
-                    router.replace("/");
-                  } catch (err) {
-                    console.error("Logout error:", err);
-                    router.replace("/");
-                  }
+                onClick={() => {
+                  logout();
                 }}
                 variant="ghost"
                 size="icon"
