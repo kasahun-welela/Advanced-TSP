@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import ErrorMessage from "@/components/ErrorMessage";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 const AllCoursesPage = () => {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -99,12 +100,12 @@ const AllCoursesPage = () => {
     <div className="max-w-6xl mx-auto p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">All Courses</h1>
-        <button
-          onClick={() => router.push("/admin/courses/createCourse")}
-          className="bg-green-100 text-black-700 px-4 py-2 rounded flex items-center gap-2 hover:bg-green-200"
+        <Link
+          href="/admin/courses/createCourse"
+          className="bg-primary/70 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-primary/80"
         >
           <FilePlus size={16} /> Create New Course
-        </button>
+        </Link>
       </div>
 
       {loading ? (
