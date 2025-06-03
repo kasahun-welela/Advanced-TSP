@@ -5,6 +5,15 @@ import { Pencil, Trash2, FilePlus, FileText } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getAllCourses, deleteCourse, getCourse } from "@/app/actions/course";
 import { Course } from "@/interfaces";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 const AllCoursesPage = () => {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -115,53 +124,63 @@ const AllCoursesPage = () => {
       ) : (
         <div className="space-y-6">
           {courses.map((course) => (
-            <div
+            <Card
+              className="w-full hover:shadow-md transition-all duration-300"
               key={course._id}
-              className="flex flex-col sm:flex-row items-start sm:items-center bg-white rounded-lg shadow p-6 hover:shadow-md transition"
             >
-              <div className="flex-1 w-full">
-                <h2 className="text-xl font-semibold mb-1">{course.title}</h2>
-                <p className="text-gray-500 text-sm">
-                  &ldquo;{course.description}&rdquo;
-                </p>
-
+              <CardHeader>
+                <CardTitle>{course.title}</CardTitle>
+                <CardDescription>{course.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
                 <div className="flex flex-wrap items-center gap-4 text-sm">
-                  <span className="bg-green-100 text-green-800 px-3 py-1 rounded">
+                  <Badge
+                    variant="secondary"
+                    className="bg-green-100 text-green-800 hover:bg-green-100"
+                  >
                     {course.price === 0 ? "Free" : `Paid - $${course.price}`}
-                  </span>
-                  <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded">
+                  </Badge>
+                  <Badge
+                    variant="secondary"
+                    className="bg-blue-100 text-blue-800 hover:bg-blue-100"
+                  >
                     {course.duration_months} Months
-                  </span>
-                  <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded">
+                  </Badge>
+                  <Badge
+                    variant="secondary"
+                    className="bg-purple-100 text-purple-800 hover:bg-purple-100"
+                  >
                     {course.delivery_method}
-                  </span>
-                  <div className="w-px h-5 bg-gray-300"></div>
-
-                  <button
-                    className="flex items-center text-blue-600 hover:underline gap-1"
-                    onClick={() => handleEdit(course._id)}
+                  </Badge>
+                  <Badge
+                    variant="secondary"
+                    className="bg-green-100 text-green-800 hover:bg-green-100"
                   >
-                    <Pencil size={14} /> Edit
-                  </button>
-
-                  <button
-                    disabled={deleting === course._id}
-                    onClick={() => {
-                      setSelectedCourse(course);
-                      setShowModal(true);
-                    }}
-                    className="flex items-center text-red-600 hover:underline gap-1 disabled:opacity-50"
-                  >
-                    <Trash2 size={14} />
-                    {deleting === course._id ? "Deleting..." : "Delete"}
-                  </button>
-
-                  <span className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded gap-1">
-                    <FileText size={14} /> {course.status}
-                  </span>
+                    <FileText size={14} className="mr-1" /> {course.status}
+                  </Badge>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+              <CardFooter className="flex gap-4">
+                <button
+                  className="flex items-center text-blue-600 hover:underline gap-1"
+                  onClick={() => handleEdit(course._id)}
+                >
+                  <Pencil size={14} /> Edit
+                </button>
+
+                <button
+                  disabled={deleting === course._id}
+                  onClick={() => {
+                    setSelectedCourse(course);
+                    setShowModal(true);
+                  }}
+                  className="flex items-center text-red-600 hover:underline gap-1 disabled:opacity-50"
+                >
+                  <Trash2 size={14} />
+                  {deleting === course._id ? "Deleting..." : "Delete"}
+                </button>
+              </CardFooter>
+            </Card>
           ))}
         </div>
       )}
