@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { getCourse, updateCourse } from "@/app/actions/course";
 import { Course } from "@/interfaces";
@@ -26,6 +26,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import ErrorMessage from "@/components/ErrorMessage";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const editCourseSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -41,6 +43,7 @@ export default function EditCoursePage() {
   const router = useRouter();
   const params = useParams();
   const courseId = params?.id as string;
+  const [isLoading, setIsLoading] = useState(true);
 
   const form = useForm<z.infer<typeof editCourseSchema>>({
     resolver: zodResolver(editCourseSchema),
@@ -56,14 +59,9 @@ export default function EditCoursePage() {
   });
 
   useEffect(() => {
-    if (!courseId) {
-      console.error("Course ID is missing in URL");
-      return;
-    }
     const fetchCourse = async () => {
       try {
         const res = await getCourse(courseId);
-
         if (res.success && res.data?.course) {
           const courseData = res.data.course;
           const formData = {
@@ -75,15 +73,16 @@ export default function EditCoursePage() {
             difficulty_level: courseData.difficulty_level,
             course_type: courseData.course_type,
           };
-          console.log("formData", formData);
           form.reset(formData);
         } else {
-          toast.error(res.error || "Failed to fetch course.");
+          toast.error(res?.error);
         }
       } catch (err: unknown) {
         const errorMessage =
           err instanceof Error ? err.message : "Error fetching course.";
         toast.error(errorMessage);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchCourse();
@@ -111,6 +110,47 @@ export default function EditCoursePage() {
       toast.error(errorMessage);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="max-w-4xl mx-auto p-8 bg-white shadow-md rounded-md mt-8 space-y-6">
+        <Skeleton className="h-8 w-1/3 mb-8" />
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-32 w-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+          <div className="flex justify-end pt-4">
+            <Skeleton className="h-10 w-32" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white shadow-md rounded-md mt-8">
