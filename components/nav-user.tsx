@@ -48,10 +48,6 @@ export function NavUser() {
     fetchUser();
   }, []);
 
-  const onLogout = async () => {
-    await logout();
-  };
-
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -131,7 +127,11 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onLogout}>
+            <DropdownMenuItem
+              onClick={() => {
+                logout();
+              }}
+            >
               <LogOut />
               Log out
             </DropdownMenuItem>

@@ -82,7 +82,7 @@ export default function CreateAccount() {
 
   return (
     <div className="min-h-screen flex justify-center items-center p-2">
-      <Card className="w-full max-w-md md:mt-24">
+      <Card className="w-full max-w-lg mt-24">
         <div className="flex justify-center">
           <i className="ri-user-add-line text-4xl text-primary p-4 rounded-full bg-primary/10"></i>
         </div>
