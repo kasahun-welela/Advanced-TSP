@@ -1,72 +1,109 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Video } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Card } from "@/components/ui/card";
+import { getAllCourses } from "@/app/actions/course";
+import { Course } from "@/interfaces";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
+import { createClassVideoSchema } from "@/validations/schema";
+import { Video } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 
-const tabs = [
-  { label: "Create Class", path: "/admin/classes/createClass" },
-  { label: "Create Class Video", path: "/admin/classes/addVideo" },
-  { label: "Create Checklist Item", path: "/admin/classes/createChecklist" },
-  {
-    label: "Create Class Component",
-    path: "/admin/classes/createClassComponent",
-  },
-];
+// const tabs = [
+//   { label: "Create Class", path: "/admin/classes/createClass" },
+//   { label: "Create Class Video", path: "/admin/classes/addVideo" },
+//   { label: "Create Checklist Item", path: "/admin/classes/createChecklist" },
+//   {
+//     label: "Create Class Component",
+//     path: "/admin/classes/createClassComponent",
+//   },
+// ];
 
 export default function CreateClassVideoPage() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [formData, setFormData] = useState({
-    courseTitle: "",
-    phaseTitle: "",
-    weekTitle: "",
-    classTitle: "",
-    videoTitle: "",
-    videoUrl: "",
-    videoLength: 0,
-    isDisabled: false,
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isLoadingCourses, setIsLoadingCourses] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setIsLoadingCourses(true);
+        const courses = await getAllCourses();
+        if (courses.success) {
+          setCourses(courses.data);
+        }
+      } catch (error: unknown) {
+        console.error("Failed to fetch courses", error);
+        toast.error("Failed to fetch courses");
+      } finally {
+        setIsLoadingCourses(false);
+      }
+    };
+    fetchCourses();
+  }, []);
+
+  const form = useForm<z.infer<typeof createClassVideoSchema>>({
+    resolver: zodResolver(createClassVideoSchema),
+    defaultValues: {
+      courseTitle: "",
+      phaseName: "",
+      weekName: "",
+      selectClass: "",
+      classVideoTitle: "",
+      classVideoURL: "",
+      classVideoLength: "",
+      disableVideo: false,
+    },
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    const target = e.target;
-    if (target instanceof HTMLInputElement && target.type === "checkbox") {
-      setFormData((prev) => ({ ...prev, [target.name]: target.checked }));
-    } else {
-      setFormData((prev) => ({ ...prev, [target.name]: target.value }));
-    }
-  };
+  async function onSubmit(values: z.infer<typeof createClassVideoSchema>) {
+    console.log("values", values);
+  }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-  };
+  const tabs = [
+    { label: "Create Class", path: "/admin/classes/createClass" },
+    { label: "Create Class Video", path: "/admin/classes/addVideo" },
+    { label: "Create Checklist Item", path: "/admin/classes/createChecklist" },
+    {
+      label: "Create Class Component",
+      path: "/admin/classes/createClassComponent",
+    },
+  ];
 
   return (
-    <div className="p-6 text-black bg-white min-h-screen">
+    <div className="p-6 text-black ">
+      {/* Page Title */}
       <h1 className="text-2xl font-bold text-green-600 mb-6 flex items-center gap-2">
         <Video className="text-green-600" />
-        Add Class Video
+        Create Class Video
       </h1>
 
-      <div className="flex space-x-4 border-b border-gray-300 mb-6 text-sm font-semibold text-gray-500">
+      {/* Tab Navigation */}
+      <div className="flex space-x-4 border-b border-gray-300 mb-6 text-sm font-medium text-gray-500">
         {tabs.map((tab) => (
           <button
             key={tab.path}
@@ -81,164 +118,235 @@ export default function CreateClassVideoPage() {
           </button>
         ))}
       </div>
-
-      <form onSubmit={handleSubmit}>
-        <Card className="shadow border-gray-200">
-          <CardContent className="space-y-6 p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="courseTitle" className="mb-1 block">
-                  Selected Course
-                </Label>
-                <Select
-                  value={formData.courseTitle}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, courseTitle: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Course" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Fullstack Web Application Development">
-                      Fullstack Web Application Development
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="phaseTitle" className="mb-1 block">
-                  Selected Phase
-                </Label>
-                <Select
-                  value={formData.phaseTitle}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, phaseTitle: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Phase" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Phase 1: Building static websites using HTML, CSS & Bootstrap">
-                      Phase 1: Building static websites using HTML, CSS &
-                      Bootstrap
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+      <Card className="p-6 border border-gray-200 my-5">
+        {isLoadingCourses ? (
+          <div className="space-y-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Course Title */}
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full" />
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="weekTitle" className="mb-1 block">
-                  Selected Week
-                </Label>
-                <Select
-                  value={formData.weekTitle}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, weekTitle: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Week" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Course Preparation Week: Before you start the class">
-                      Course Preparation Week: Before you start the class
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="classTitle" className="mb-1 block">
-                  Selected Class
-                </Label>
-                <Select
-                  value={formData.classTitle}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, classTitle: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Class" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Basic computer skills - part I">
-                      Basic computer skills - part I
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            {/* Phase Name */}
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full" />
             </div>
-
-            <div>
-              <Label htmlFor="videoTitle" className="mb-1 block">
-                Class Video Title
-              </Label>
-              <Input
-                id="videoTitle"
-                name="videoTitle"
-                type="text"
-                placeholder="e.g. Basics of computer skills - Part 1"
-                value={formData.videoTitle}
-                onChange={handleChange}
+            {/* Week Name */}
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            {/* Select Class */}
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            {/* Class Video Title */}
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            {/* Video URL */}
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            {/* Video Length */}
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            {/* Disable Video */}
+            <div className="space-y-2 flex items-center gap-2 ">
+              <Skeleton className="h-6 w-6" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+            {/* Submit Button */}
+            <div className="col-span-1 md:col-span-2 flex justify-center gap-4 pt-4">
+              <Skeleton className="h-10 w-32" />
+            </div>
+          </div>
+        ) : (
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-5 grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
+              {/* Course Title */}
+              <FormField
+                control={form.control}
+                name="courseTitle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Course Title</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl className="w-full">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a course title" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {courses.map((course) => (
+                          <SelectItem key={course._id} value={course._id}>
+                            {course.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="videoUrl" className="mb-1 block">
-                  Video Link
-                </Label>
-                <Input
-                  id="videoUrl"
-                  name="videoUrl"
-                  type="text"
-                  placeholder="https://www.youtube.com"
-                  value={formData.videoUrl}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="videoLength" className="mb-1 block">
-                  Video Length (min)
-                </Label>
-                <Input
-                  id="videoLength"
-                  name="videoLength"
-                  type="number"
-                  value={formData.videoLength}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="isDisabled"
-                checked={formData.isDisabled}
-                onCheckedChange={(checked) =>
-                  setFormData((prev) => ({ ...prev, isDisabled: !!checked }))
-                }
+              {/* Select Phase */}
+              <FormField
+                control={form.control}
+                name="phaseName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Select Phase</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl className="w-full">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a phase" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="phase 1">phase 1</SelectItem>
+                        <SelectItem value="phase 2">phase 2</SelectItem>
+                        <SelectItem value="phase 3">phase 3</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <Label htmlFor="isDisabled">Disable Video</Label>
-            </div>
+              <FormField
+                control={form.control}
+                name="weekName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Week Name</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl className="w-full">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a week name" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="week 1">week 1</SelectItem>
+                        <SelectItem value="week 2">week 2</SelectItem>
+                        <SelectItem value="week 3">week 3</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="selectClass"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Select Class</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl className="w-full">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a class" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="class 1">class 1</SelectItem>
+                        <SelectItem value="class 2">class 2</SelectItem>
+                        <SelectItem value="class 3">class 3</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="flex justify-end pt-4">
-              <Button
-                className="bg-green-500 hover:bg-orange-600 text-white"
-                type="submit"
-              >
-                Save & Next →
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </form>
+              <FormField
+                control={form.control}
+                name="classVideoTitle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Class Video Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Class Video Title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="classVideoURL"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Video URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Video URL" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="classVideoLength"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Video Length (minutes)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Video Length" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="disableVideo"
+                render={({ field }) => (
+                  <FormItem className="flex items-center gap-2 ">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Disable Video</FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
+
+              <div className="col-span-1 md:col-span-2 flex justify-center gap-4 pt-4">
+                <Button
+                  type="submit"
+                  className="bg-primary text-white hover:bg-primary/80"
+                >
+                  Save & Next →
+                </Button>
+              </div>
+            </form>
+          </Form>
+        )}
+      </Card>
     </div>
   );
 }

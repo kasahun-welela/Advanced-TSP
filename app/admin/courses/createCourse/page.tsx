@@ -1,330 +1,308 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { Book } from "lucide-react";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createCourse } from "@/app/actions/course";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
-import { toast } from "sonner";
-import { createCourse } from "@/app/actions/course";
-import Image from "next/image";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { CreateCourse } from "@/interfaces";
+
+const createCourseSchema = z.object({
+  title: z.string().min(1, "Course Title is required"),
+  description: z.string().min(1, "Course Description is required"),
+  price: z.number().min(0, "Course Price must be 0 or greater"),
+  duration_months: z.number().min(1, "Course Duration must be 1 or greater"),
+  status: z.enum(["draft", "pending review", "published"]),
+  difficulty_level: z.enum(["beginner", "intermediate", "advance"]),
+  delivery_method: z.string().min(1, "Course Delivery Method is required"),
+  course_type: z.enum(["free", "paid"]),
+  logo_url: z.string().min(1, "Course logo is required"),
+});
 
 export default function CreateCoursePage() {
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    thumbnail: "/uploads/courses/fullstack-thumbnail.jpg",
-    logo_url: "",
-    price: 0,
-    difficulty_level: "beginner",
-    status: "draft",
-    duration_months: 1,
-    course_type: "free",
-    delivery_method: "online",
-  });
-
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<boolean>(false);
-  const [iconPreview, setIconPreview] = useState<string>("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   const router = useRouter();
-  const pathname = usePathname();
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value, type } = e.target;
-    const val = type === "number" ? Number(value) : value;
-    setFormData((prev) => ({ ...prev, [name]: val }));
-  };
+  const form = useForm<z.infer<typeof createCourseSchema>>({
+    resolver: zodResolver(createCourseSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      price: 0,
+      duration_months: 0,
+      status: "draft",
+      difficulty_level: "beginner",
+      delivery_method: "",
+      course_type: "free",
+      logo_url: "",
+    },
+  });
+  const fileRef = form.register("logo_url");
 
-  const handleIconUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/jpg"];
-    if (!allowedTypes.includes(file.type)) {
-      setError("Invalid file type. Only JPG, PNG, and GIF allowed.");
-      return;
-    }
-
-    const img = new window.Image();
-    img.src = URL.createObjectURL(file);
-
-    img.onload = () => {
-      if (img.width !== 60 || img.height !== 60) {
-        setError("Course icon must be exactly 60 x 60 pixels.");
-        return;
-      }
-
-      setError(null);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64 = reader.result?.toString() || "";
-        setFormData((prev) => ({ ...prev, logo_url: base64 }));
-        setIconPreview(base64);
-      };
-      reader.readAsDataURL(file);
-    };
-  };
-  console.log("Submitting formData:", formData);
-  const handleSubmit = async () => {
+  const onSubmit = async (values: z.infer<typeof createCourseSchema>) => {
     setLoading(true);
-    setError(null);
-    setSuccess(false);
-
-    const requiredFields = [
-      "title",
-      "description",
-      "price",
-      "difficulty_level",
-      "status",
-      "duration_months",
-      "course_type",
-      "delivery_method",
-      "logo_url",
-    ];
-
-    const missingField = requiredFields.find(
-      (field) => !formData[field as keyof typeof formData]
-    );
-    if (missingField) {
-      setError(`Please fill in the required field: ${missingField}`);
-      setLoading(false);
-      return;
-    }
-
     try {
-      const res = await createCourse(formData);
+      // const requestPayload = {
+      //   ...values,
+      //   thumbnail: values.logo_url,
+      // } as CreateCourse;
 
-      if (!res.success) {
-        console.error("Course creation failed:", res.error);
-        throw new Error(res.error);
+      const formData = new FormData();
+      formData.append("title", values.title);
+      if (values.description)
+        formData.append("description", values.description);
+      formData.append("logo_url", values.logo_url);
+
+      const res = await createCourse(formData as unknown as CreateCourse);
+      if (res.success) {
+        toast.success("Course created successfully!");
+        router.push("/admin/courses/allCourse");
+      } else {
+        toast.error(res.error || "Failed to create course");
       }
-
-      toast.success("Course Created", {
-        description: "Your course was successfully created.",
-        className: "bg-green-50 border border-green-400 text-green-700",
-      });
-
-      setSuccess(true);
-      setFormData({
-        title: "",
-        description: "",
-        thumbnail: "/uploads/courses/fullstack-thumbnail.jpg",
-        logo_url: "",
-        price: 0,
-        difficulty_level: "beginner",
-        status: "draft",
-        duration_months: 1,
-        course_type: "free",
-        delivery_method: "online",
-      });
-      setIconPreview("");
     } catch (err: unknown) {
-      console.error("Error occurred while creating course:", err);
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      const errorMessage =
+        err instanceof Error ? err.message : "Error creating course.";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  const tabs = [
-    { label: "Create Course", path: "/admin/courses/createCourse" },
-    { label: "Create Phase", path: "/admin/courses/createPhase" },
-    { label: "Create Week", path: "/admin/courses/createWeek" },
-    { label: "Week Component", path: "/admin/courses/createWeekComponent" },
-  ];
-
   return (
-    <div className="p-6 text-black bg-white min-h-screen">
-      <h1 className="text-2xl font-bold text-green-600 mb-6 flex items-center gap-2">
-        <Book className="text-green-500" />
-        Create Course
-      </h1>
+    <Card className="max-w-4xl mx-auto p-8 bg-white rounded-md mt-8">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold text-primary border-b pb-2">
+          Create New Course
+        </CardTitle>
+      </CardHeader>
 
-      <div className="flex space-x-4 border-b border-gray-300 mb-6 text-sm font-semibold text-gray-600">
-        {tabs.map((tab) => (
-          <button
-            key={tab.path}
-            onClick={() => router.push(tab.path)}
-            className={`pb-2 ${
-              pathname === tab.path
-                ? "border-b-2 border-green-500 text-green-600"
-                : "hover:text-black"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      <Card className="p-6 border border-gray-200 space-y-5">
-        <div className="space-y-4 text-sm">
-          <div>
-            <Label>
-              Course Title <span className="text-red-500">*</span>
-            </Label>
-            <Input
+      <CardContent className="">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
               name="title"
-              required
-              value={formData.title}
-              onChange={handleChange}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Course Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter course title" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div>
-            <Label>
-              Upload Course Icon (60x60 JPG, PNG, GIF){" "}
-              <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              ref={fileInputRef}
-              type="file"
-              accept=".jpg,.jpeg,.png,.gif"
-              onChange={handleIconUpload}
+
+            <FormField
+              control={form.control}
+              name="logo_url"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Upload Course Logo (JPG, PNG, GIF)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="file"
+                      accept=".jpg,.jpeg,.png,.gif"
+                      // {...field}
+                      {...fileRef}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {iconPreview && (
-              <Image
-                src={iconPreview}
-                alt="Icon Preview"
-                className="mt-2 rounded border w-[60px] h-[60px] object-cover"
-              />
-            )}
-          </div>
-          <div>
-            <Label>
-              Description <span className="text-red-500">*</span>
-            </Label>
-            <Textarea
+
+            <FormField
+              control={form.control}
               name="description"
-              rows={4}
-              value={formData.description}
-              onChange={handleChange}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Enter course description"
+                      rows={4}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div>
-            <Label>
-              Price <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              type="number"
+            <FormField
+              control={form.control}
               name="price"
-              value={formData.price}
-              onChange={handleChange}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Price</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Enter price"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div>
-            <Label>
-              Difficulty Level <span className="text-red-500">*</span>
-            </Label>
-            <select
+            <FormField
+              control={form.control}
               name="difficulty_level"
-              value={formData.difficulty_level}
-              onChange={handleChange}
-              className="w-full border px-3 py-2 rounded"
-            >
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advance">Advance</option>
-            </select>
-          </div>
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Difficulty Level</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select difficulty level" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="beginner">Beginner</SelectItem>
+                      <SelectItem value="intermediate">Intermediate</SelectItem>
+                      <SelectItem value="advance">Advance</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <div>
-            <Label>
-              Status <span className="text-red-500">*</span>
-            </Label>
-            <select
+            <FormField
+              control={form.control}
               name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full border px-3 py-2 rounded"
-            >
-              <option value="draft">Draft</option>
-              <option value="pending review">Pending Review</option>
-              <option value="published">Published</option>
-            </select>
-          </div>
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="pending review">
+                        Pending Review
+                      </SelectItem>
+                      <SelectItem value="published">Published</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <div>
-            <Label>
-              Duration (months) <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              type="number"
+            <FormField
+              control={form.control}
               name="duration_months"
-              value={formData.duration_months}
-              onChange={handleChange}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Duration (months)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Enter duration in months"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div>
-            <Label>
-              Delivery Method <span className="text-red-500">*</span>
-            </Label>
-            <Input
+            <FormField
+              control={form.control}
               name="delivery_method"
-              value={formData.delivery_method}
-              onChange={handleChange}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Delivery Method</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter delivery method" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div>
-            <Label>
-              Course Type <span className="text-red-500">*</span>
-            </Label>
-            <div className="flex gap-6 mt-2 text-gray-700">
-              <label className="flex items-center space-x-2">
-                <Input
-                  type="radio"
-                  name="course_type"
-                  value="free"
-                  checked={formData.course_type === "free"}
-                  onChange={handleChange}
-                />
-                <span>Free</span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <Input
-                  type="radio"
-                  name="course_type"
-                  value="paid"
-                  checked={formData.course_type === "paid"}
-                  onChange={handleChange}
-                />
-                <span>Paid</span>
-              </label>
+            <FormField
+              control={form.control}
+              name="course_type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Course Type</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex gap-6"
+                    >
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <RadioGroupItem value="free" />
+                        </FormControl>
+                        <Label>Free</Label>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <RadioGroupItem value="paid" />
+                        </FormControl>
+                        <Label>Paid</Label>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex justify-end gap-4 pt-4">
+              <Button
+                type="submit"
+                disabled={loading}
+                className="bg-green-500 hover:bg-green-600 text-white"
+              >
+                {loading ? "Saving..." : "Save & Next →"}
+              </Button>
             </div>
-          </div>
-          {error && <p className="text-red-600 text-sm">{error}</p>}
-          {success && (
-            <p className="text-green-600 text-sm">
-              Course created successfully!
-            </p>
-          )}
-
-          <div className="flex justify-end gap-4 pt-4">
-            {/* <Button onClick={handleSubmit} disabled={loading} variant="outline" className="bg-blue-600 text-white hover:bg-blue-700">
-              {loading ? "Saving..." : "Save & Create New"}
-            </Button> */}
-            <Button
-              onClick={handleSubmit}
-              disabled={loading}
-              className="bg-green-500 hover:bg-orange-600 text-white"
-            >
-              {loading ? "Saving..." : "Save & Next →"}
-            </Button>
-          </div>
-        </div>
-      </Card>
-    </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }
