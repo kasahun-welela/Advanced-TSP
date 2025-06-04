@@ -45,7 +45,8 @@ export default function CreatePhase() {
         if (courses.success) {
           setCourses(courses.data);
         }
-      } catch (error) {
+      } catch (error: unknown) {
+        console.error("Failed to fetch courses", error);
         toast.error("Failed to fetch courses");
       } finally {
         setIsLoadingCourses(false);
@@ -231,14 +232,13 @@ export default function CreatePhase() {
               <FormField
                 control={form.control}
                 name="phaseIcon"
-                render={({ field: { onChange, value, ...field } }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phase Icon</FormLabel>
                     <FormControl>
                       <Input
                         type="file"
                         accept=".jpg,.jpeg,.png,.gif"
-                        onChange={(e) => onChange(e.target.files?.[0])}
                         {...field}
                       />
                     </FormControl>

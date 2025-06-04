@@ -46,7 +46,8 @@ export default function CreateWeekPage() {
         if (courses.success) {
           setCourses(courses.data);
         }
-      } catch (error) {
+      } catch (error: unknown) {
+        console.error("Failed to fetch courses", error);
         toast.error("Failed to fetch courses");
       } finally {
         setIsLoadingCourses(false);

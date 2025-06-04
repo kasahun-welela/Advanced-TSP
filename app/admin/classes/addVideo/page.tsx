@@ -31,15 +31,15 @@ import { createClassVideoSchema } from "@/validations/schema";
 import { Video } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 
-const tabs = [
-  { label: "Create Class", path: "/admin/classes/createClass" },
-  { label: "Create Class Video", path: "/admin/classes/addVideo" },
-  { label: "Create Checklist Item", path: "/admin/classes/createChecklist" },
-  {
-    label: "Create Class Component",
-    path: "/admin/classes/createClassComponent",
-  },
-];
+// const tabs = [
+//   { label: "Create Class", path: "/admin/classes/createClass" },
+//   { label: "Create Class Video", path: "/admin/classes/addVideo" },
+//   { label: "Create Checklist Item", path: "/admin/classes/createChecklist" },
+//   {
+//     label: "Create Class Component",
+//     path: "/admin/classes/createClassComponent",
+//   },
+// ];
 
 export default function CreateClassVideoPage() {
   const router = useRouter();
@@ -56,7 +56,8 @@ export default function CreateClassVideoPage() {
         if (courses.success) {
           setCourses(courses.data);
         }
-      } catch (error) {
+      } catch (error: unknown) {
+        console.error("Failed to fetch courses", error);
         toast.error("Failed to fetch courses");
       } finally {
         setIsLoadingCourses(false);

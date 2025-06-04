@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createCourse } from "@/app/actions/course";
 import { toast } from "sonner";
@@ -120,7 +120,7 @@ export default function CreateCoursePage() {
             <FormField
               control={form.control}
               name="logo_url"
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <FormLabel>Upload Course Logo (JPG, PNG, GIF)</FormLabel>
                   <FormControl>
