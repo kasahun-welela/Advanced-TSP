@@ -18,3 +18,11 @@ export const createWeekSchema = z.object({
   groupSession: z.string().min(6, "Group session is required"),
   liveSession: z.string().min(6, "Live session is required"),
 });
+
+export const createClassSchema = z.object({
+  courseTitle: z.string().min(6, "Course title is required"),
+  phaseName: z.string().min(6, "Phase name is required"),
+  weekName: z.string().min(6, "Week name is required"),
+  classTopic: z.string().min(6, "Class topic is required"),
+  description: z.string().min(6, "Description is required"),
+});
