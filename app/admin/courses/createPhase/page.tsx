@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { BookOpen } from "lucide-react";
-
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -16,41 +18,62 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { createPhaseSchema } from "@/validations/schema";
+import { getAllCourses } from "@/app/actions/course";
+import { Course } from "@/interfaces";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default function CreatePhasePage() {
+export default function CreatePhase() {
   const router = useRouter();
   const pathname = usePathname();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isLoadingCourses, setIsLoadingCourses] = useState(true);
 
-  const [formData, setFormData] = useState({
-    courseTitle: "",
-    phaseName: "",
-    phaseTitle: "",
-    phaseUrl: "",
-    description: "",
-    icon: null as File | null,
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setIsLoadingCourses(true);
+        const courses = await getAllCourses();
+        if (courses.success) {
+          setCourses(courses.data);
+        }
+      } catch (error) {
+        toast.error("Failed to fetch courses");
+      } finally {
+        setIsLoadingCourses(false);
+      }
+    };
+    fetchCourses();
+  }, []);
+
+  const form = useForm<z.infer<typeof createPhaseSchema>>({
+    resolver: zodResolver(createPhaseSchema),
+    defaultValues: {
+      courseTitle: "",
+      phaseName: "",
+      phaseTitle: "",
+      phaseUrl: "",
+      description: "",
+    },
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSelectChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, courseTitle: value }));
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setFormData((prev) => ({ ...prev, icon: file }));
-  };
+  async function onSubmit(values: z.infer<typeof createPhaseSchema>) {
+    console.log("values", values);
+  }
 
   const tabs = [
-    { label: "Create Course", path: "/dashboard/courses/createCourse" },
-    { label: "Create Phase", path: "/dashboard/courses/createPhase" },
-    { label: "Create Week", path: "/dashboard/courses/createWeek" },
-    { label: "Week Component", path: "/dashboard/courses/createWeekComponent" },
+    { label: "Create Course", path: "/admin/courses/createCourse" },
+    { label: "Create Phase", path: "/admin/courses/createPhase" },
+    { label: "Create Week", path: "/admin/courses/createWeek" },
+    { label: "Week Component", path: "/admin/courses/createWeekComponent" },
   ];
 
   return (
@@ -69,7 +92,7 @@ export default function CreatePhasePage() {
             onClick={() => router.push(tab.path)}
             className={`pb-2 ${
               pathname === tab.path
-                ? "border-b-2 border-green-500 text-green-600"
+                ? "border-b-2 border-primary text-primary"
                 : "hover:text-black"
             }`}
           >
@@ -79,96 +102,165 @@ export default function CreatePhasePage() {
       </div>
 
       {/* Form Card */}
-      <Card className="p-6 border border-gray-200 space-y-5">
-        {/* Course Title */}
-        <div>
-          <Label className="mb-1 text-gray-800">Course Title</Label>
-          <Select
-            value={formData.courseTitle}
-            onValueChange={handleSelectChange}
-          >
-            <SelectTrigger className="bg-white text-black border border-gray-300">
-              <SelectValue placeholder="Select a course" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Fullstack Web Application Development">
-                Fullstack Web Application Development
-              </SelectItem>
-              {/* Dynamically render more options as needed */}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Phase Name & Title */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label className="mb-1 text-gray-800">Phase Name</Label>
-            <Input
-              name="phaseName"
-              value={formData.phaseName}
-              onChange={handleChange}
-              placeholder="Phase-1"
-            />
+      <Card className="p-6 border border-gray-200 my-5">
+        {isLoadingCourses ? (
+          <div className="space-y-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-32 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="flex justify-end gap-4 pt-4">
+              <Skeleton className="h-10 w-32" />
+            </div>
           </div>
-          <div>
-            <Label className="mb-1 text-gray-800">Phase Title</Label>
-            <Input
-              name="phaseTitle"
-              value={formData.phaseTitle}
-              onChange={handleChange}
-              placeholder="Basic computer skills"
-            />
-          </div>
-        </div>
+        ) : (
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-5 grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
+              {/* Course Title */}
+              <FormField
+                control={form.control}
+                name="courseTitle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Course Title</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl className="w-full">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a course title" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {courses.map((course) => (
+                          <SelectItem key={course._id} value={course._id}>
+                            {course.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        {/* Phase URL */}
-        <div>
-          <Label className="mb-1 text-gray-800">Phase URL</Label>
-          <Input
-            name="phaseUrl"
-            value={formData.phaseUrl}
-            onChange={handleChange}
-            placeholder="/basic-computer-skills"
-          />
-        </div>
+              <FormField
+                control={form.control}
+                name="phaseName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phase Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Phase-1" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        {/* Description */}
-        <div>
-          <Label className="mb-1 text-gray-800">Description</Label>
-          <Textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows={4}
-            placeholder="Enter phase description"
-          />
-        </div>
+              <FormField
+                control={form.control}
+                name="phaseTitle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phase Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Basic computer skills" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        {/* File Upload */}
-        <div>
-          <Label className="mb-1 text-gray-800">Phase Icon</Label>
-          <Input
-            type="file"
-            accept=".jpg,.jpeg,.png,.gif"
-            onChange={handleFileChange}
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            60×60 | jpg, jpeg, gif, png
-          </p>
-        </div>
+              <FormField
+                control={form.control}
+                name="phaseUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phase URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="/basic-computer-skills" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        {/* Buttons */}
-        <div className="flex justify-end gap-4 pt-4">
-          {/* <Button type="submit" variant="outline" className="bg-blue-600 text-white hover:bg-blue-700">
-            Save & Create New Phase
-          </Button> */}
-          <Button
-            type="submit"
-            className="bg-green-500 text-white hover:bg-orange-600"
-          >
-            Save & Next →
-          </Button>
-        </div>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Enter phase description"
+                        rows={4}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phaseIcon"
+                render={({ field: { onChange, value, ...field } }) => (
+                  <FormItem>
+                    <FormLabel>Phase Icon</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        accept=".jpg,.jpeg,.png,.gif"
+                        onChange={(e) => onChange(e.target.files?.[0])}
+                        {...field}
+                      />
+                    </FormControl>
+                    <p className="text-xs text-gray-500 mt-1">
+                      60×60 | jpg, jpeg, gif, png
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex justify-end gap-4 pt-4">
+                <Button
+                  type="submit"
+                  className="bg-green-500 text-white hover:bg-orange-600"
+                >
+                  Save & Next →
+                </Button>
+              </div>
+            </form>
+          </Form>
+        )}
       </Card>
     </div>
   );
