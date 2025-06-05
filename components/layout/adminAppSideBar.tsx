@@ -2,8 +2,6 @@
 
 import * as React from "react";
 import {
-  Bot,
-  SquareTerminal,
   BookOpen,
   Layers,
   Users,
@@ -29,31 +27,6 @@ import {
 // This is sample data.
 const data = {
   navMain: [
-    {
-      title: "Courses",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "My Course",
-          url: "/dashboard",
-        },
-      ],
-    },
-    {
-      title: "Certification",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "My Certificate",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navAdmin: [
     {
       title: "Course Management",
       url: "#",
@@ -233,7 +206,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavMain items={data.navAdmin} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />
