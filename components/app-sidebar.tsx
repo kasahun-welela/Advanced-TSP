@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useState, useEffect, ComponentProps } from "react";
 import {
   Bot,
   SquareTerminal,
@@ -13,6 +13,7 @@ import {
   Activity,
   BarChart3,
 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { NavMain } from "@/components/nav-main";
 // import { NavProjects } from "@/components/nav-projects";
@@ -25,8 +26,9 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { isUserAdmin } from "@/app/actions/auth";
 
-// This is sample data.
+// This is side navigation data.
 const data = {
   navMain: [
     {
@@ -225,15 +227,56 @@ const data = {
   ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const adminStatus = await isUserAdmin();
+      if (adminStatus === null) {
+        window.location.reload();
+        return;
+      }
+      setIsAdmin(adminStatus);
+      setIsLoading(false);
+    };
+    checkAdmin();
+  }, []);
+
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex flex-col gap-4 p-4">
+  //       <Skeleton className="h-12 w-full" />
+  //       <Skeleton className="h-8 w-3/4" />
+  //       <Skeleton className="h-8 w-3/4" />
+  //       <Skeleton className="h-8 w-3/4" />
+  //     </div>
+  //   );
+  // }
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavMain items={data.navAdmin} />
+        {isLoading ? (
+          <div className="flex flex-col gap-4 p-4">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-8 w-3/4" />
+          </div>
+        ) : (
+          <>
+            <NavMain items={data.navMain} />
+            {isAdmin && <NavMain items={data.navAdmin} />}
+          </>
+        )}
       </SidebarContent>
       <SidebarFooter>
         <NavUser />
