@@ -43,6 +43,7 @@ export default function EditCoursePage() {
   const params = useParams();
   const courseId = params?.id as string;
   const [isLoading, setIsLoading] = useState(true);
+  const [isCourseNotFound, setIsCourseNotFound] = useState(false);
 
   const form = useForm<z.infer<typeof editCourseSchema>>({
     resolver: zodResolver(editCourseSchema),
@@ -74,7 +75,8 @@ export default function EditCoursePage() {
           };
           form.reset(formData);
         } else {
-          toast.error(res?.error);
+          toast.error("Course not found");
+          setIsCourseNotFound(true);
         }
       } catch (err: unknown) {
         const errorMessage =
@@ -152,10 +154,10 @@ export default function EditCoursePage() {
     );
   }
 
-  if (!form.getValues("title")) {
+  if (isCourseNotFound) {
     return (
       <div className="max-w-4xl mx-auto p-8 bg-white shadow-md rounded-md mt-8">
-        <ErrorMessage message="Course not found or failed to load" />
+        <ErrorMessage message="Course not found" />
       </div>
     );
   }
