@@ -45,7 +45,7 @@ function NavBar() {
   return (
     <>
       {/* Desktop Navigation */}
-      <div className="hidden md:block fixed top-0 left-0 right-0 bg-white dark:bg-slate-800 shadow z-50 tracking-widest">
+      <div className="hidden md:block fixed top-0 left-0 right-0 bg-white dark:bg-slate-800  z-50 tracking-widest">
         <div className="flex justify-between items-center py-2 md:max-w-[80%] max-w-[90%] mx-auto">
           <Link href="/">
             {" "}
@@ -123,7 +123,7 @@ function NavBar() {
       </div>
 
       {/* Mobile Navigation */}
-      <div className="bg-white dark:bg-slate-800  flex justify-between items-center px-5 md:hidden py-5 fixed top-0 left-0 right-0 shadow-sm z-50 transition-all duration-300">
+      <div className="bg-white dark:bg-slate-800  flex justify-between items-center px-5 md:hidden py-5 fixed top-0 left-0 right-0  z-50 transition-all duration-300">
         <Link href="/">
           <Image src={logo} alt="E-learning logo" height={50} width={50} />
         </Link>
