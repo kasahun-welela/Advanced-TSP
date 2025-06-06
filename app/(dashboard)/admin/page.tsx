@@ -1,5 +1,6 @@
 "use client";
 
+import DashboardHeader from "@/components/DashboardHeader";
 import QuickLinkCard from "@/components/QuickLInkCard";
 import {
   BookOpen,
@@ -105,15 +106,18 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-      {quickLinks.map((section, index) => (
-        <QuickLinkCard
-          key={index}
-          title={section.title}
-          icon={section.icon}
-          links={section.links}
-        />
-      ))}
-    </div>
+    <>
+      <DashboardHeader previousPage="Dashboard" currentPage="Admin" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+        {quickLinks.map((section, index) => (
+          <QuickLinkCard
+            key={index}
+            title={section.title}
+            icon={section.icon}
+            links={section.links}
+          />
+        ))}
+      </div>
+    </>
   );
 }
