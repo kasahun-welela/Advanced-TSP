@@ -27,6 +27,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { isUserAdmin } from "@/app/actions/auth";
+import { NavAdmin } from "./nav-admin";
 
 // This is side navigation data.
 const data = {
@@ -244,17 +245,6 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
     checkAdmin();
   }, []);
 
-  // if (isLoading) {
-  //   return (
-  //     <div className="flex flex-col gap-4 p-4">
-  //       <Skeleton className="h-12 w-full" />
-  //       <Skeleton className="h-8 w-3/4" />
-  //       <Skeleton className="h-8 w-3/4" />
-  //       <Skeleton className="h-8 w-3/4" />
-  //     </div>
-  //   );
-  // }
-
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -274,7 +264,7 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
         ) : (
           <>
             <NavMain items={data.navMain} />
-            {isAdmin && <NavMain items={data.navAdmin} />}
+            {isAdmin && <NavAdmin items={data.navAdmin} />}
           </>
         )}
       </SidebarContent>
