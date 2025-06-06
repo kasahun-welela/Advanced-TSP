@@ -11,7 +11,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  useSidebar,
+  //   useSidebar,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import {
@@ -34,7 +34,7 @@ export function NavAdmin({
     }[];
   }[];
 }) {
-  const { isMobile } = useSidebar();
+  //   const { isMobile } = useSidebar();
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">

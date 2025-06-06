@@ -108,7 +108,7 @@ const data = {
       ],
     },
     {
-      title: "Batch & Group Management",
+      title: "Batch and Group ",
       url: "#",
       icon: Users,
       items: [
