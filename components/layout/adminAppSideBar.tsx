@@ -1,9 +1,7 @@
 "use client";
 
-import { useState, useEffect, ComponentProps } from "react";
+import * as React from "react";
 import {
-  Bot,
-  SquareTerminal,
   BookOpen,
   Layers,
   Users,
@@ -13,7 +11,6 @@ import {
   Activity,
   BarChart3,
 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 
 import { NavMain } from "@/components/nav-main";
 // import { NavProjects } from "@/components/nav-projects";
@@ -26,37 +23,10 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { isUserAdmin } from "@/app/actions/auth";
-import { NavAdmin } from "./nav-admin";
 
-// This is side navigation data.
+// This is sample data.
 const data = {
   navMain: [
-    {
-      title: "Courses",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "My Course",
-          url: "/dashboard",
-        },
-      ],
-    },
-    {
-      title: "Certification",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "My Certificate",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navAdmin: [
     {
       title: "Course Management",
       url: "#",
@@ -108,7 +78,7 @@ const data = {
       ],
     },
     {
-      title: "Batch and Group ",
+      title: "Batch & Group Management",
       url: "#",
       icon: Users,
       items: [
@@ -228,45 +198,14 @@ const data = {
   ],
 };
 
-export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const checkAdmin = async () => {
-      const adminStatus = await isUserAdmin();
-      if (adminStatus === null) {
-        window.location.reload();
-        return;
-      }
-      setIsAdmin(adminStatus);
-      setIsLoading(false);
-    };
-    checkAdmin();
-  }, []);
-
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher />
       </SidebarHeader>
       <SidebarContent>
-        {isLoading ? (
-          <div className="flex flex-col gap-4 p-4">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-8 w-3/4" />
-          </div>
-        ) : (
-          <>
-            <NavMain items={data.navMain} />
-            {isAdmin && <NavAdmin items={data.navAdmin} />}
-          </>
-        )}
+        <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

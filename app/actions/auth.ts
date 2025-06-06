@@ -107,4 +107,18 @@ export async function getUserProfileDetails() {
   return response.data;
 }
 
+export async function isUserAdmin() {
+  const cookieStore = await cookies();
+
+  const userDataStr = cookieStore.get("user")?.value || "";
+  const userData = userDataStr ? JSON.parse(userDataStr) : null;
+  if (!userData) {
+    return false;
+  }
+  if (userData) {
+    return userData.roles.includes("admin");
+  }
+  return false;
+}
+
 
