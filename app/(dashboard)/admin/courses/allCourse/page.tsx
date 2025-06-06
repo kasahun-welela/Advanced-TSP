@@ -97,7 +97,7 @@ const AllCoursesPage = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="md:max-w-[80%] max-w-[90%] mx-auto md:mx-0  md:ml-12">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">All Courses</h1>
         <Link
