@@ -4,17 +4,17 @@ import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section className="py-12 md:py-24 mt-16">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        <div className="space-y-8">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight capitalize">
+    <section className="my-24 md:my-18">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-4">
+        <div className="space-y-4 md:space-y-8">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight capitalize">
             Up your <span className="text-primary">Skills</span> to{" "}
             <span className="text-primary">Advance</span> your{" "}
             <span className="text-primary">career</span> path
           </h1>
           <p className="text-gray-600 text-lg md:text-xl">
-            Learn UI-UX Design skills with weekend UX. The latest online
-            learning system and material that help your knowledge growing.
+            Master in-demand skills with flexible online learning. Our latest
+            courses and resources help you grow your expertise anytime, anywhere
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
