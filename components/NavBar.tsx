@@ -45,7 +45,7 @@ function NavBar() {
   return (
     <>
       {/* Desktop Navigation */}
-      <div className="hidden md:block fixed top-0 left-0 right-0 bg-white dark:bg-slate-800 shadow z-50 tracking-widest">
+      <div className="hidden md:block fixed top-0 left-0 right-0 bg-white dark:bg-slate-800  z-50 tracking-widest">
         <div className="flex justify-between items-center py-2 md:max-w-[80%] max-w-[90%] mx-auto">
           <Link href="/">
             {" "}
@@ -56,7 +56,7 @@ function NavBar() {
               <li>
                 <Link
                   href="/"
-                  className={`text-base md:text-lg font-medium ${
+                  className={`text-base  font-medium ${
                     path === "/" ? "text-primary font-semibold" : ""
                   } hover:font-semibold hover:text-primary transition-all duration-200`}
                 >
@@ -66,7 +66,7 @@ function NavBar() {
               <li>
                 <Link
                   href="/about"
-                  className={`text-base md:text-lg font-medium ${
+                  className={`text-base  font-medium ${
                     path === "/about" ? "text-primary font-semibold" : ""
                   } hover:font-semibold hover:text-primary transition-all duration-200`}
                 >
@@ -76,7 +76,7 @@ function NavBar() {
               <li>
                 <Link
                   href="/#courses"
-                  className={`text-base md:text-lg font-medium ${
+                  className={`text-base  font-medium ${
                     path === "#courses" ? "text-primary font-semibold" : ""
                   } hover:font-semibold hover:text-primary transition-all duration-200`}
                 >
@@ -86,34 +86,34 @@ function NavBar() {
               <li>
                 <Link
                   href="/contact-us"
-                  className={`text-base md:text-lg font-medium ${
+                  className={`text-base  font-medium ${
                     path === "/contact-us" ? "text-primary font-semibold" : ""
                   } hover:font-semibold hover:text-primary transition-all duration-200`}
                 >
                   Contact Us
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/faq"
-                  className={`text-base md:text-lg font-medium ${
+                  className={`text-base  font-medium ${
                     path === "/faq" ? "text-primary font-semibold" : ""
                   } hover:font-semibold hover:text-primary transition-all duration-200`}
                 >
                   {"FAQ's"}
                 </Link>
-              </li>
+              </li> */}
             </ul>
             <div className="flex items-center gap-4">
               <Link
                 href="/signin"
-                className="text-base md:text-lg font-medium  hover:text-primary/80 transition-all duration-200"
+                className="text-base  font-medium  hover:text-primary/80 transition-all duration-200"
               >
                 Sign In
               </Link>
               <Link
                 href="/create-account"
-                className="bg-primary text-white px-6 md:px-8  py-3 rounded-lg text-base md:text-lg font-medium hover:bg-primary/80 transition-all duration-200"
+                className="bg-primary text-white px-6 md:px-8  py-3 rounded-lg text-base  font-medium hover:bg-primary/80 transition-all duration-200"
               >
                 Create Account
               </Link>
@@ -123,7 +123,7 @@ function NavBar() {
       </div>
 
       {/* Mobile Navigation */}
-      <div className="bg-white dark:bg-slate-800  flex justify-between items-center px-5 md:hidden py-5 fixed top-0 left-0 right-0 shadow-sm z-50 transition-all duration-300">
+      <div className="bg-white dark:bg-slate-800  flex justify-between items-center px-5 md:hidden py-5 fixed top-0 left-0 right-0  z-50 transition-all duration-300">
         <Link href="/">
           <Image src={logo} alt="E-learning logo" height={50} width={50} />
         </Link>
@@ -210,7 +210,7 @@ function NavBar() {
                     Contact Us
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link
                     className={`${
                       path === "/faq" ? "text-primary font-semibold" : ""
@@ -220,7 +220,7 @@ function NavBar() {
                   >
                     {"FAQ's"}
                   </Link>
-                </li>
+                </li> */}
               </ul>
               <div className="p-4 space-y-4 border-t">
                 <Link
