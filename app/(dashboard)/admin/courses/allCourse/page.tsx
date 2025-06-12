@@ -3,7 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { Pencil, Trash2, FilePlus, FileText } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { getAllCourses, deleteCourse, getCourse } from "@/app/actions/course";
+import {
+  getAllCourses,
+  deleteCourse,
+  getCourseById,
+} from "@/app/actions/course";
 import { Course } from "@/interfaces";
 import {
   Card,
@@ -82,7 +86,7 @@ const AllCoursesPage = () => {
 
   const handleEdit = async (courseId: string) => {
     try {
-      const res = await getCourse(courseId);
+      const res = await getCourseById(courseId);
 
       if (res.success && res.data) {
         localStorage.setItem("editCourse", JSON.stringify(res.data));
@@ -139,97 +143,102 @@ const AllCoursesPage = () => {
         ) : (
           <div className="space-y-6">
             {courses.map((course) => (
-              <Card
-                className="w-full hover:shadow-md transition-all duration-300"
+              <Link
+                href={`/admin/courses/${course._id}`}
+                className="hover:shadow-md transition-all duration-300 "
                 key={course._id}
               >
-                <CardHeader>
-                  <CardTitle>{course.title}</CardTitle>
-                  <CardDescription>{course.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap items-center gap-4 text-sm">
-                    <Badge
-                      variant="secondary"
-                      className="bg-green-100 text-green-800 hover:bg-green-100"
-                    >
-                      {course.price === 0 ? "Free" : `Paid - $${course.price}`}
-                    </Badge>
-                    <Badge
-                      variant="secondary"
-                      className="bg-blue-100 text-blue-800 hover:bg-blue-100"
-                    >
-                      {course.duration_months} Months
-                    </Badge>
-                    <Badge
-                      variant="secondary"
-                      className="bg-purple-100 text-purple-800 hover:bg-purple-100"
-                    >
-                      {course.delivery_method}
-                    </Badge>
-                    <Badge
-                      variant="secondary"
-                      className="bg-green-100 text-green-800 hover:bg-green-100"
-                    >
-                      <FileText size={14} className="mr-1" /> {course.status}
-                    </Badge>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex gap-4">
-                  <Button
-                    variant="outline"
-                    disabled={loading}
-                    onClick={() => handleEdit(course._id)}
-                    className="flex items-center text-blue-600 hover:underline gap-1 disabled:opacity-50"
-                  >
-                    <Pencil size={14} /> Edit
-                  </Button>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        disabled={loading}
-                        className="text-red-600 hover:underline gap-1 disabled:opacity-50"
+                <Card className="w-full my-2">
+                  <CardHeader>
+                    <CardTitle>{course.title}</CardTitle>
+                    <CardDescription>{course.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap items-center gap-4 text-sm">
+                      <Badge
+                        variant="secondary"
+                        className="bg-green-100 text-green-800 hover:bg-green-100"
                       >
-                        <Trash2 size={14} />
-                        {loading ? "Deleting..." : "Delete"}
-                      </Button>
-                    </DialogTrigger>
+                        {course.price === 0
+                          ? "Free"
+                          : `Paid - $${course.price}`}
+                      </Badge>
+                      <Badge
+                        variant="secondary"
+                        className="bg-blue-100 text-blue-800 hover:bg-blue-100"
+                      >
+                        {course.duration_months} Months
+                      </Badge>
+                      <Badge
+                        variant="secondary"
+                        className="bg-purple-100 text-purple-800 hover:bg-purple-100"
+                      >
+                        {course.delivery_method}
+                      </Badge>
+                      <Badge
+                        variant="secondary"
+                        className="bg-green-100 text-green-800 hover:bg-green-100"
+                      >
+                        <FileText size={14} className="mr-1" /> {course.status}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex gap-4">
+                    <Button
+                      variant="outline"
+                      disabled={loading}
+                      onClick={() => handleEdit(course._id)}
+                      className="flex items-center text-blue-600 hover:underline gap-1 disabled:opacity-50"
+                    >
+                      <Pencil size={14} /> Edit
+                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          disabled={loading}
+                          className="text-red-600 hover:underline gap-1 disabled:opacity-50"
+                        >
+                          <Trash2 size={14} />
+                          {loading ? "Deleting..." : "Delete"}
+                        </Button>
+                      </DialogTrigger>
 
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                          <span className="text-red-500">⚠️</span>
-                          Confirm Delete
-                        </DialogTitle>
-                        <DialogDescription>
-                          Are you sure you want to delete{" "}
-                          <strong>{course?.title} </strong> course?
-                        </DialogDescription>
-                      </DialogHeader>
-                      <DialogFooter className="flex gap-4">
-                        <DialogClose asChild>
-                          <Button type="button" variant="secondary">
-                            Close
-                          </Button>
-                        </DialogClose>
-                        <DialogClose asChild>
-                          <Button
-                            variant="destructive"
-                            disabled={loading}
-                            onClick={async () => {
-                              await handleDelete(course._id);
-                            }}
-                          >
-                            {loading ? "Deleting..." : "Delete"}
-                          </Button>
-                        </DialogClose>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                  ;
-                </CardFooter>
-              </Card>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle className="flex items-center gap-2">
+                            <span className="text-red-500">⚠️</span>
+                            Confirm Delete
+                          </DialogTitle>
+                          <DialogDescription>
+                            Are you sure you want to delete{" "}
+                            <strong>{course?.title} </strong> course?
+                          </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter className="flex gap-4">
+                          <DialogClose asChild>
+                            <Button type="button" variant="secondary">
+                              Close
+                            </Button>
+                          </DialogClose>
+                          <DialogClose asChild>
+                            <Button
+                              variant="destructive"
+                              disabled={loading}
+                              onClick={async () => {
+                                await handleDelete(course._id);
+                              }}
+                            >
+                              {loading ? "Deleting..." : "Delete"}
+                            </Button>
+                          </DialogClose>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                    ;
+                  </CardFooter>
+                </Card>
+              </Link>
             ))}
           </div>
         )}
