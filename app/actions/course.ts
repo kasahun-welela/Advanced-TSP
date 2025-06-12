@@ -65,7 +65,7 @@ export async function deleteCourse(courseId: string) {
   }
 }
 
-export async function getCourse(courseId: string) {
+export async function getCourseById(courseId: string) {
   try {
     const res = await axiosInstance.get(`/courses/${courseId}`);
     return {
