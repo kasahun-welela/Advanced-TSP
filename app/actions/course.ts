@@ -5,10 +5,21 @@ import axiosInstance from "@/lib/axios";
 
 export async function createCourse(formData: CreateCourse) {
   try {
-    const res = await axiosInstance.post("/courses", formData);
-    return {
-      success: true,
-      data: res.data,   
+    const res = await axiosInstance.post("/courses", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    if(res.data.success) {
+      return {
+        success: true,
+        data: res.data,
+      };
+    } else {
+      return {
+        success: false,
+        error: res.data.error,
+      };
     };
   } catch (error: unknown) {
     console.error("Create course error:", error);

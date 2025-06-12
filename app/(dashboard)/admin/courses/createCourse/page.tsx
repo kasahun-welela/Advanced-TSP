@@ -40,7 +40,12 @@ const createCourseSchema = z.object({
   difficulty_level: z.enum(["beginner", "intermediate", "advance"]),
   delivery_method: z.string().min(1, "Course Delivery Method is required"),
   course_type: z.enum(["free", "paid"]),
-  logo_url: z.string().min(1, "Course logo is required"),
+  thumbnail: z
+    .instanceof(File)
+    .refine(
+      (file) => file.size <= 1024 * 1024 * 5,
+      "File size must be less than 5MB"
+    ),
 });
 
 export default function CreateCoursePage() {
@@ -58,24 +63,23 @@ export default function CreateCoursePage() {
       difficulty_level: "beginner",
       delivery_method: "",
       course_type: "free",
-      logo_url: "",
+      thumbnail: null as unknown as File,
     },
   });
-  const fileRef = form.register("logo_url");
 
   const onSubmit = async (values: z.infer<typeof createCourseSchema>) => {
     setLoading(true);
     try {
-      // const requestPayload = {
-      //   ...values,
-      //   thumbnail: values.logo_url,
-      // } as CreateCourse;
-
       const formData = new FormData();
       formData.append("title", values.title);
-      if (values.description)
-        formData.append("description", values.description);
-      formData.append("logo_url", values.logo_url);
+      formData.append("description", values.description);
+      formData.append("price", values.price.toString());
+      formData.append("duration_months", values.duration_months.toString());
+      formData.append("status", values.status);
+      formData.append("difficulty_level", values.difficulty_level);
+      formData.append("delivery_method", values.delivery_method);
+      formData.append("course_type", values.course_type);
+      formData.append("thumbnail", values.thumbnail);
 
       const res = await createCourse(formData as unknown as CreateCourse);
       if (res.success) {
@@ -126,16 +130,21 @@ export default function CreateCoursePage() {
 
                 <FormField
                   control={form.control}
-                  name="logo_url"
-                  render={() => (
+                  name="thumbnail"
+                  render={({ field }) => (
                     <FormItem>
                       <FormLabel>Upload Course Logo (JPG, PNG, GIF)</FormLabel>
                       <FormControl>
                         <Input
                           type="file"
                           accept=".jpg,.jpeg,.png,.gif"
-                          // {...field}
-                          {...fileRef}
+                          name={field.name}
+                          ref={field.ref}
+                          onBlur={field.onBlur}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) field.onChange(file);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
