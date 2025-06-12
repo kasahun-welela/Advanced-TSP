@@ -37,3 +37,20 @@ export const createClassVideoSchema = z.object({
   classVideoLength: z.string().min(1, "Video length is required"),
   disableVideo: z.boolean(),
 });
+
+export const createCourseSchema = z.object({
+  title: z.string().min(1, "Course Title is required"),
+  description: z.string().min(1, "Course Description is required"),
+  price: z.number().min(0, "Course Price must be 0 or greater"),
+  duration_months: z.number().min(1, "Course Duration must be 1 or greater"),
+  status: z.enum(["draft", "pending review", "published"]),
+  difficulty_level: z.enum(["beginner", "intermediate", "advance"]),
+  delivery_method: z.string().min(1, "Course Delivery Method is required"),
+  course_type: z.enum(["free", "paid"]),
+  thumbnail: z
+    .instanceof(File)
+    .refine(
+      (file) => file.size <= 1024 * 1024 * 5,
+      "File size must be less than 5MB"
+    ),
+});

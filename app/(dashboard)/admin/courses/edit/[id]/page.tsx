@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { getCourse, updateCourse } from "@/app/actions/course";
+import { getCourseById, updateCourse } from "@/app/actions/course";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -63,7 +63,7 @@ export default function EditCoursePage() {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const res = await getCourse(courseId);
+        const res = await getCourseById(courseId);
         if (res.success && res.data?.course) {
           const courseData = res.data.course;
           const formData = {

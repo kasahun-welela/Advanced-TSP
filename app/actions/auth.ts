@@ -2,18 +2,14 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import axiosInstance from "@/lib/axios";
+import axios from "axios";
 
 export async function login(formData: { email: string; password: string }) {
   try {
+    
     const response = await axiosInstance.post("/auth/login", formData);
     const data = response.data;
 
-    if (!data.success) {
-      return {
-        success: false,
-        error: data.errors?.[0]?.msg || "Authentication failed",
-      };
-    }
 
     if (data?.accessToken || !data?.refreshToken) {
       const cookieStore = await cookies();
@@ -51,9 +47,15 @@ export async function login(formData: { email: string; password: string }) {
       };
     }
   } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      return {
+        success: false,
+        error: "Invalid credentials",
+      };
+    }
     return {
       success: false,
-      error: error,
+      error: "An unexpected error occurred",
     };
   }
 }
