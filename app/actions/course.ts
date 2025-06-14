@@ -126,3 +126,20 @@ export async function createCoursePhase(formData: CreatePhase) {
     };
   }
 }
+
+export async function getPhasesByCourseId(course: string) {
+  try {
+    const res = await axiosInstance.get(`/phases?course=${course}`);
+    return {
+      success: true,
+      data: res.data
+    };
+  } catch (error: unknown) {  
+    console.error("Get phases error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to fetch phases";
+    return {
+      success: false,
+      error: errorMessage
+    };
+  }
+}

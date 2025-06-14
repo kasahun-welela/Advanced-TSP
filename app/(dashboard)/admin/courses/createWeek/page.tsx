@@ -25,7 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
-import { getAllCourses } from "@/app/actions/course";
+import { getAllCourses, getPhasesByCourseId } from "@/app/actions/course";
 import { Course } from "@/interfaces";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -38,7 +38,8 @@ export default function CreateWeekPage() {
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
-
+  const [phases, setPhases] = useState<any[]>([]);
+  const [isLoadingPhases, setIsLoadingPhases] = useState(false);
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -69,10 +70,33 @@ export default function CreateWeekPage() {
     },
   });
 
+  // useEffect(() => {
+  //   const fetchPhases = async () => {
+  //     const phases = await getPhasesByCourseId(form.getValues("courseTitle"));
+  //     console.log("phases", phases);
+  //     if (phases.success) {
+  //       setPhases(phases.data);
+  //     }
+  //   };
+  //   fetchPhases();
+  // }, [form.getValues("courseTitle")]);
+
   async function onSubmit(values: z.infer<typeof createWeekSchema>) {
     console.log("values", values);
   }
 
+  const fetchPhases = async (courseId: string) => {
+    // this for fetching phases by course id
+    setIsLoadingPhases(true);
+    const res = await getPhasesByCourseId(courseId);
+    console.log("phases", res);
+    if (res.success) {
+      setPhases(res.data?.data || []);
+    } else {
+      toast.error(res.error);
+    }
+    setIsLoadingPhases(false);
+  };
   const tabs = [
     { label: "Create Course", path: "/admin/courses/createCourse" },
     { label: "Create Phase", path: "/admin/courses/createPhase" },
@@ -152,7 +176,10 @@ export default function CreateWeekPage() {
                     <FormItem>
                       <FormLabel>Course Title</FormLabel>
                       <Select
-                        onValueChange={field.onChange}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          fetchPhases(value);
+                        }}
                         defaultValue={field.value}
                       >
                         <FormControl className="w-full">
@@ -185,13 +212,25 @@ export default function CreateWeekPage() {
                       >
                         <FormControl className="w-full">
                           <SelectTrigger>
-                            <SelectValue placeholder="Select a phase" />
+                            {isLoadingPhases ? (
+                              <Skeleton className="h-10 w-full" />
+                            ) : (
+                              <SelectValue placeholder="Select a phase" />
+                            )}
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="phase 1">phase 1</SelectItem>
-                          <SelectItem value="phase 2">phase 2</SelectItem>
-                          <SelectItem value="phase 3">phase 3</SelectItem>
+                          {phases.length === 0 && isLoadingPhases === false ? (
+                            <p className="text-sm text-gray-500">
+                              No phases found for this course
+                            </p>
+                          ) : (
+                            phases.map((phase) => (
+                              <SelectItem key={phase._id} value={phase._id}>
+                                {phase.title}
+                              </SelectItem>
+                            ))
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
