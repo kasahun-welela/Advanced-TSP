@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Calendar } from "lucide-react";
+import { Calendar, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
@@ -25,7 +25,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
-import { getAllCourses, getPhasesByCourseId } from "@/app/actions/course";
+import {
+  getAllCourses,
+  getPhasesByCourseId,
+  createWeek,
+} from "@/app/actions/course";
 import { Course } from "@/interfaces";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -45,6 +49,7 @@ export default function CreateWeekPage() {
   const [isLoadingGroupSessions, setIsLoadingGroupSessions] = useState(false);
   const [liveSessions, setLiveSessions] = useState<any[]>([]);
   const [isLoadingLiveSessions, setIsLoadingLiveSessions] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -100,26 +105,34 @@ export default function CreateWeekPage() {
     defaultValues: {
       courseTitle: "",
       phaseName: "",
-      weekName: "",
       weekTitle: "",
       groupSession: "",
       liveSession: "",
+      order_number: 1,
     },
   });
 
-  // useEffect(() => {
-  //   const fetchPhases = async () => {
-  //     const phases = await getPhasesByCourseId(form.getValues("courseTitle"));
-  //     console.log("phases", phases);
-  //     if (phases.success) {
-  //       setPhases(phases.data);
-  //     }
-  //   };
-  //   fetchPhases();
-  // }, [form.getValues("courseTitle")]);
-
   async function onSubmit(values: z.infer<typeof createWeekSchema>) {
-    console.log("values", values);
+    setIsLoading(true);
+    const payload = {
+      phase: values.phaseName,
+      title: values.weekTitle,
+      description: values.weekTitle,
+      group_session: values.groupSession,
+      live_session: values.liveSession,
+      order_number: values.order_number,
+    };
+    try {
+      const res = await createWeek(payload);
+      if (res.success) {
+        toast.success("Week created successfully");
+      }
+    } catch (error: unknown) {
+      console.error("Failed to create week", error);
+      toast.error("Failed to create week");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   const fetchPhases = async (courseId: string) => {
@@ -277,12 +290,19 @@ export default function CreateWeekPage() {
 
                 <FormField
                   control={form.control}
-                  name="weekName"
+                  name="order_number"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Week Name</FormLabel>
+                      <FormLabel>Week Order</FormLabel>
                       <FormControl>
-                        <Input placeholder="Week-1" {...field} />
+                        <Input
+                          placeholder="1"
+                          type="number"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -296,7 +316,7 @@ export default function CreateWeekPage() {
                     <FormItem>
                       <FormLabel>Week Title</FormLabel>
                       <FormControl>
-                        <Input placeholder="Basic computer skills" {...field} />
+                        <Input placeholder="Week-1" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -371,8 +391,16 @@ export default function CreateWeekPage() {
                   <Button
                     type="submit"
                     className="bg-green-500 text-white hover:bg-orange-600"
+                    disabled={isLoading}
                   >
-                    Save & Next →
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="animate-spin" />
+                        <span className="ml-2">Creating Week...</span>
+                      </>
+                    ) : (
+                      "Create Week"
+                    )}
                   </Button>
                 </div>
               </form>

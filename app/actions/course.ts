@@ -1,6 +1,6 @@
 "use server";
 
-import { CreateCourse, Course, CreatePhase } from "@/interfaces";
+import { CreateCourse, Course, CreatePhase, CreateWeek } from "@/interfaces";
 import axiosInstance from "@/lib/axios";
 
 export async function createCourse(formData: CreateCourse) {
@@ -137,6 +137,23 @@ export async function getPhasesByCourseId(course: string) {
   } catch (error: unknown) {  
     console.error("Get phases error:", error);
     const errorMessage = error instanceof Error ? error.message : "Failed to fetch phases";
+    return {
+      success: false,
+      error: errorMessage
+    };
+  }
+}
+
+export async function createWeek(formData: CreateWeek) {
+  try {
+    const res = await axiosInstance.post("/weeks", formData);
+    return {
+      success: true,
+      data: res.data,
+    };
+  } catch (error: unknown) {
+    console.error("Create week error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to create week";
     return {
       success: false,
       error: errorMessage

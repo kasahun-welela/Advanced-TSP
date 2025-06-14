@@ -41,3 +41,11 @@ export interface CreatePhase {
   phaseOrder: number;
   phaseIcon: File;
 } 
+
+export interface CreateWeek {
+  phase: string;
+  title: string;
+  group_session: string;
+  live_session: string;
+  order_number: number;
+}

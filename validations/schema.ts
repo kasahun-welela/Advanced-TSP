@@ -18,10 +18,10 @@ export const createPhaseSchema = z.object({
 export const createWeekSchema = z.object({
   courseTitle: z.string().min(6, "Course title is required"),
   phaseName: z.string().min(6, "Phase name is required"),
-  weekName: z.string().min(6, "Week name is required"),
-  weekTitle: z.string().min(6, "Week title is required"),
+  weekTitle: z.string().min(5, "Week title is required"),
   groupSession: z.string().min(6, "Group session is required"),
   liveSession: z.string().min(6, "Live session is required"),
+  order_number: z.number().min(1, "Week order is required"),
 });
 
 export const createClassSchema = z.object({
