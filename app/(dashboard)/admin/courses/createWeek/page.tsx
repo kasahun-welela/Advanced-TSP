@@ -31,6 +31,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { createWeekSchema } from "@/validations/schema";
 import DashboardHeader from "@/components/DashboardHeader";
+import { getGroupSessions } from "@/app/actions/session";
 
 export default function CreateWeekPage() {
   const router = useRouter();
@@ -40,6 +41,8 @@ export default function CreateWeekPage() {
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
   const [phases, setPhases] = useState<any[]>([]);
   const [isLoadingPhases, setIsLoadingPhases] = useState(false);
+  const [groupSessions, setGroupSessions] = useState<any[]>([]);
+  const [isLoadingGroupSessions, setIsLoadingGroupSessions] = useState(false);
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -55,7 +58,23 @@ export default function CreateWeekPage() {
         setIsLoadingCourses(false);
       }
     };
+    const fetchGroupSessions = async () => {
+      try {
+        setIsLoadingGroupSessions(true);
+        const res = await getGroupSessions();
+        if (res.success) {
+          setGroupSessions(res.data?.data || []);
+          console.log("groupSessions", res.data?.data);
+        }
+      } catch (error: unknown) {
+        console.error("Failed to fetch group sessions", error);
+        toast.error("Failed to fetch group sessions");
+      } finally {
+        setIsLoadingGroupSessions(false);
+      }
+    };
     fetchCourses();
+    fetchGroupSessions();
   }, []);
 
   const form = useForm<z.infer<typeof createWeekSchema>>({
@@ -282,9 +301,11 @@ export default function CreateWeekPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="group 1">group 1</SelectItem>
-                          <SelectItem value="group 2">group 2</SelectItem>
-                          <SelectItem value="group 3">group 3</SelectItem>
+                          {groupSessions.map((session) => (
+                            <SelectItem key={session._id} value={session._id}>
+                              {session.name}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
