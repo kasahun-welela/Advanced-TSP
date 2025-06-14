@@ -224,24 +224,6 @@ export default function CreatePhase() {
 
                 <FormField
                   control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Enter phase description"
-                          rows={4}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
                   name="order_number"
                   render={({ field }) => (
                     <FormItem>
@@ -254,6 +236,24 @@ export default function CreatePhase() {
                           onChange={(e) =>
                             field.onChange(Number(e.target.value))
                           }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Enter phase description"
+                          rows={4}
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />

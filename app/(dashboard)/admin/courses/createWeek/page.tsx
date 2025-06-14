@@ -202,14 +202,11 @@ export default function CreateWeekPage() {
               </div>
               <div className="space-y-2">
                 <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-10 w-full" />
               </div>
               <div className="space-y-2">
                 <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-10 w-32" />
-              </div>
-              <div className="flex justify-end gap-4 pt-4">
-                <Skeleton className="h-10 w-32" />
+                <Skeleton className="h-10 w-full" />
               </div>
             </div>
           ) : (
@@ -256,33 +253,34 @@ export default function CreateWeekPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Select Phase</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl className="w-full">
-                          <SelectTrigger>
-                            {isLoadingPhases ? (
-                              <Skeleton className="h-10 w-full" />
-                            ) : (
+                      {isLoadingPhases ? (
+                        <Skeleton className="h-10 w-full" />
+                      ) : (
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl className="w-full">
+                            <SelectTrigger>
                               <SelectValue placeholder="Select a phase" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {phases.length === 0 &&
+                            isLoadingPhases === false ? (
+                              <p className="text-sm text-gray-500">
+                                No phases found for this course
+                              </p>
+                            ) : (
+                              phases.map((phase) => (
+                                <SelectItem key={phase._id} value={phase._id}>
+                                  {phase.title}
+                                </SelectItem>
+                              ))
                             )}
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {phases.length === 0 && isLoadingPhases === false ? (
-                            <p className="text-sm text-gray-500">
-                              No phases found for this course
-                            </p>
-                          ) : (
-                            phases.map((phase) => (
-                              <SelectItem key={phase._id} value={phase._id}>
-                                {phase.title}
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
+                          </SelectContent>
+                        </Select>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -323,15 +321,15 @@ export default function CreateWeekPage() {
                   )}
                 />
 
-                {isLoadingGroupSessions ? (
-                  <Skeleton className="h-10 w-full" />
-                ) : (
-                  <FormField
-                    control={form.control}
-                    name="groupSession"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Group Session</FormLabel>
+                <FormField
+                  control={form.control}
+                  name="groupSession"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Group Session</FormLabel>
+                      {isLoadingGroupSessions ? (
+                        <Skeleton className="h-10 w-full" />
+                      ) : (
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
@@ -342,28 +340,38 @@ export default function CreateWeekPage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {groupSessions.map((session) => (
-                              <SelectItem key={session._id} value={session._id}>
-                                {session.name}
-                              </SelectItem>
-                            ))}
+                            {groupSessions.length === 0 &&
+                            isLoadingGroupSessions === false ? (
+                              <p className="text-sm text-gray-500">
+                                No group sessions found
+                              </p>
+                            ) : (
+                              groupSessions.map((session) => (
+                                <SelectItem
+                                  key={session._id}
+                                  value={session._id}
+                                >
+                                  {session.name}
+                                </SelectItem>
+                              ))
+                            )}
                           </SelectContent>
                         </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                {isLoadingLiveSessions ? (
-                  <Skeleton className="h-10 w-full" />
-                ) : (
-                  <FormField
-                    control={form.control}
-                    name="liveSession"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Live Session</FormLabel>
+                <FormField
+                  control={form.control}
+                  name="liveSession"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Live Session</FormLabel>
+                      {isLoadingLiveSessions ? (
+                        <Skeleton className="h-10 w-full" />
+                      ) : (
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
@@ -374,18 +382,28 @@ export default function CreateWeekPage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {liveSessions.map((session) => (
-                              <SelectItem key={session._id} value={session._id}>
-                                {session.title}
-                              </SelectItem>
-                            ))}
+                            {liveSessions.length === 0 &&
+                            isLoadingLiveSessions === false ? (
+                              <p className="text-sm text-gray-500">
+                                No live sessions found
+                              </p>
+                            ) : (
+                              liveSessions.map((session) => (
+                                <SelectItem
+                                  key={session._id}
+                                  value={session._id}
+                                >
+                                  {session.title}
+                                </SelectItem>
+                              ))
+                            )}
                           </SelectContent>
                         </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <div className="flex justify-end gap-4 pt-4">
                   <Button
