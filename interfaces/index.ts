@@ -49,3 +49,21 @@ export interface CreateWeek {
   live_session: string;
   order_number: number;
 }
+
+export interface Phase {
+  _id: string;
+  title: string;
+  description: string;
+  phaseOrder: number;
+  phaseIcon: string;
+}
+
+export interface GroupSession {
+  _id: string;
+  name: string;
+}
+
+export interface LiveSession {
+  _id: string;
+  title: string;
+}

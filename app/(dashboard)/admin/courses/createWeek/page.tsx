@@ -30,7 +30,7 @@ import {
   getPhasesByCourseId,
   createWeek,
 } from "@/app/actions/course";
-import { Course } from "@/interfaces";
+import { Course, LiveSession, GroupSession, Phase } from "@/interfaces";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { createWeekSchema } from "@/validations/schema";
@@ -43,11 +43,11 @@ export default function CreateWeekPage() {
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
-  const [phases, setPhases] = useState<any[]>([]);
+  const [phases, setPhases] = useState<Phase[]>([]);
   const [isLoadingPhases, setIsLoadingPhases] = useState(false);
-  const [groupSessions, setGroupSessions] = useState<any[]>([]);
+  const [groupSessions, setGroupSessions] = useState<GroupSession[]>([]);
   const [isLoadingGroupSessions, setIsLoadingGroupSessions] = useState(false);
-  const [liveSessions, setLiveSessions] = useState<any[]>([]);
+  const [liveSessions, setLiveSessions] = useState<LiveSession[]>([]);
   const [isLoadingLiveSessions, setIsLoadingLiveSessions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {

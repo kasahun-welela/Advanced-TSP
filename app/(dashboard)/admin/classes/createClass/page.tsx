@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
 import { getAllCourses, getPhasesByCourseId } from "@/app/actions/course";
-import { Course } from "@/interfaces";
+import { Course, Phase } from "@/interfaces";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { createClassSchema } from "@/validations/schema";
@@ -39,7 +39,7 @@ export default function CreateClassPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
   const [isLoadingPhases, setIsLoadingPhases] = useState(false);
-  const [phases, setPhases] = useState<any[]>([]);
+  const [phases, setPhases] = useState<Phase[]>([]);
   useEffect(() => {
     const fetchCourses = async () => {
       try {
