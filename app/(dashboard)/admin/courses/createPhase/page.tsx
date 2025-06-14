@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Loader2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -27,8 +27,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { createPhaseSchema } from "@/validations/schema";
-import { getAllCourses } from "@/app/actions/course";
+import { createCoursePhase, getAllCourses } from "@/app/actions/course";
 import { Course } from "@/interfaces";
+import type { CreatePhase } from "@/interfaces";
 import { Skeleton } from "@/components/ui/skeleton";
 import DashboardHeader from "@/components/DashboardHeader";
 
@@ -37,6 +38,7 @@ export default function CreatePhase() {
   const pathname = usePathname();
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -59,16 +61,33 @@ export default function CreatePhase() {
   const form = useForm<z.infer<typeof createPhaseSchema>>({
     resolver: zodResolver(createPhaseSchema),
     defaultValues: {
-      courseTitle: "",
-      phaseName: "",
-      phaseTitle: "",
-      phaseUrl: "",
+      course: "",
+      title: "",
+      display_title: "",
       description: "",
+      order_number: 0,
+      icon_url: undefined,
     },
   });
 
   async function onSubmit(values: z.infer<typeof createPhaseSchema>) {
+    setIsLoading(true);
     console.log("values", values);
+    const formData = new FormData();
+    formData.append("course", values.course);
+    formData.append("title", values.title);
+    formData.append("display_title", values.display_title);
+    formData.append("description", values.description);
+    formData.append("order_number", Number(values.order_number).toString());
+    formData.append("icon_url", values.icon_url);
+    const res = await createCoursePhase(formData as unknown as CreatePhase);
+    if (res.success) {
+      toast.success("Phase created successfully");
+      router.push("/admin/courses/createPhase");
+    } else {
+      toast.error(res.error);
+    }
+    setIsLoading(false);
   }
 
   const tabs = [
@@ -146,7 +165,7 @@ export default function CreatePhase() {
                 {/* Course Title */}
                 <FormField
                   control={form.control}
-                  name="courseTitle"
+                  name="course"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Course Title</FormLabel>
@@ -174,21 +193,7 @@ export default function CreatePhase() {
 
                 <FormField
                   control={form.control}
-                  name="phaseName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phase Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Phase-1" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="phaseTitle"
+                  name="title"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Phase Title</FormLabel>
@@ -202,14 +207,35 @@ export default function CreatePhase() {
 
                 <FormField
                   control={form.control}
-                  name="phaseUrl"
+                  name="display_title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phase URL</FormLabel>
+                      <FormLabel>Display Title</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="/basic-computer-skills"
                           {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="order_number"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phase Order</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="1"
+                          type="number"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -237,7 +263,7 @@ export default function CreatePhase() {
 
                 <FormField
                   control={form.control}
-                  name="phaseIcon"
+                  name="icon_url"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Phase Icon</FormLabel>
@@ -245,7 +271,13 @@ export default function CreatePhase() {
                         <Input
                           type="file"
                           accept=".jpg,.jpeg,.png,.gif"
-                          {...field}
+                          name={field.name}
+                          ref={field.ref}
+                          onBlur={field.onBlur}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) field.onChange(file);
+                          }}
                         />
                       </FormControl>
                       <p className="text-xs text-gray-500 mt-1">
@@ -260,8 +292,16 @@ export default function CreatePhase() {
                   <Button
                     type="submit"
                     className="bg-green-500 text-white hover:bg-orange-600"
+                    disabled={isLoading}
                   >
-                    Save & Next →
+                    {isLoading ? (
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="animate-spin" />
+                        Creating...
+                      </div>
+                    ) : (
+                      "Create Phase"
+                    )}
                   </Button>
                 </div>
               </form>

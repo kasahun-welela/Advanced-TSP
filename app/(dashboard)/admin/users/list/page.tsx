@@ -166,6 +166,8 @@ export default function ListUsersPage() {
                 <td className="p-3 flex items-center gap-2">
                   <Image
                     src={user.avatar}
+                    width={32}
+                    height={32}
                     alt="avatar"
                     className="w-8 h-8 rounded-full"
                   />

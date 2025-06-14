@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Calendar } from "lucide-react";
+import { Calendar, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
@@ -25,12 +25,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
-import { getAllCourses } from "@/app/actions/course";
-import { Course } from "@/interfaces";
+import {
+  getAllCourses,
+  getPhasesByCourseId,
+  createWeek,
+} from "@/app/actions/course";
+import { Course, LiveSession, GroupSession, Phase } from "@/interfaces";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { createWeekSchema } from "@/validations/schema";
 import DashboardHeader from "@/components/DashboardHeader";
+import { getGroupSessions, getLiveSessions } from "@/app/actions/session";
 
 export default function CreateWeekPage() {
   const router = useRouter();
@@ -38,7 +43,13 @@ export default function CreateWeekPage() {
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
-
+  const [phases, setPhases] = useState<Phase[]>([]);
+  const [isLoadingPhases, setIsLoadingPhases] = useState(false);
+  const [groupSessions, setGroupSessions] = useState<GroupSession[]>([]);
+  const [isLoadingGroupSessions, setIsLoadingGroupSessions] = useState(false);
+  const [liveSessions, setLiveSessions] = useState<LiveSession[]>([]);
+  const [isLoadingLiveSessions, setIsLoadingLiveSessions] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -54,7 +65,39 @@ export default function CreateWeekPage() {
         setIsLoadingCourses(false);
       }
     };
+    const fetchGroupSessions = async () => {
+      try {
+        setIsLoadingGroupSessions(true);
+        const res = await getGroupSessions();
+        if (res.success) {
+          setGroupSessions(res.data?.data || []);
+        }
+      } catch (error: unknown) {
+        console.error("Failed to fetch group sessions", error);
+        toast.error("Failed to fetch group sessions");
+      } finally {
+        setIsLoadingGroupSessions(false);
+      }
+    };
+    const fetchLiveSessions = async () => {
+      try {
+        setIsLoadingLiveSessions(true);
+        const res = await getLiveSessions();
+        if (res.success) {
+          setLiveSessions(res.data?.data || []);
+          console.log("liveSessions", res.data?.data);
+        }
+      } catch (error: unknown) {
+        console.error("Failed to fetch live sessions", error);
+        toast.error("Failed to fetch live sessions");
+      } finally {
+        setIsLoadingLiveSessions(false);
+      }
+    };
+
     fetchCourses();
+    fetchGroupSessions();
+    fetchLiveSessions();
   }, []);
 
   const form = useForm<z.infer<typeof createWeekSchema>>({
@@ -62,17 +105,48 @@ export default function CreateWeekPage() {
     defaultValues: {
       courseTitle: "",
       phaseName: "",
-      weekName: "",
       weekTitle: "",
       groupSession: "",
       liveSession: "",
+      order_number: 1,
     },
   });
 
   async function onSubmit(values: z.infer<typeof createWeekSchema>) {
-    console.log("values", values);
+    setIsLoading(true);
+    const payload = {
+      phase: values.phaseName,
+      title: values.weekTitle,
+      description: values.weekTitle,
+      group_session: values.groupSession,
+      live_session: values.liveSession,
+      order_number: values.order_number,
+    };
+    try {
+      const res = await createWeek(payload);
+      if (res.success) {
+        toast.success("Week created successfully");
+      }
+    } catch (error: unknown) {
+      console.error("Failed to create week", error);
+      toast.error("Failed to create week");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
+  const fetchPhases = async (courseId: string) => {
+    // this for fetching phases by course id
+    setIsLoadingPhases(true);
+    const res = await getPhasesByCourseId(courseId);
+    console.log("phases", res);
+    if (res.success) {
+      setPhases(res.data?.data || []);
+    } else {
+      toast.error(res.error);
+    }
+    setIsLoadingPhases(false);
+  };
   const tabs = [
     { label: "Create Course", path: "/admin/courses/createCourse" },
     { label: "Create Phase", path: "/admin/courses/createPhase" },
@@ -128,14 +202,11 @@ export default function CreateWeekPage() {
               </div>
               <div className="space-y-2">
                 <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-10 w-full" />
               </div>
               <div className="space-y-2">
                 <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-10 w-32" />
-              </div>
-              <div className="flex justify-end gap-4 pt-4">
-                <Skeleton className="h-10 w-32" />
+                <Skeleton className="h-10 w-full" />
               </div>
             </div>
           ) : (
@@ -152,7 +223,10 @@ export default function CreateWeekPage() {
                     <FormItem>
                       <FormLabel>Course Title</FormLabel>
                       <Select
-                        onValueChange={field.onChange}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          fetchPhases(value);
+                        }}
                         defaultValue={field.value}
                       >
                         <FormControl className="w-full">
@@ -179,21 +253,34 @@ export default function CreateWeekPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Select Phase</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl className="w-full">
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a phase" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="phase 1">phase 1</SelectItem>
-                          <SelectItem value="phase 2">phase 2</SelectItem>
-                          <SelectItem value="phase 3">phase 3</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {isLoadingPhases ? (
+                        <Skeleton className="h-10 w-full" />
+                      ) : (
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl className="w-full">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a phase" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {phases.length === 0 &&
+                            isLoadingPhases === false ? (
+                              <p className="text-sm text-gray-500">
+                                No phases found for this course
+                              </p>
+                            ) : (
+                              phases.map((phase) => (
+                                <SelectItem key={phase._id} value={phase._id}>
+                                  {phase.title}
+                                </SelectItem>
+                              ))
+                            )}
+                          </SelectContent>
+                        </Select>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -201,12 +288,19 @@ export default function CreateWeekPage() {
 
                 <FormField
                   control={form.control}
-                  name="weekName"
+                  name="order_number"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Week Name</FormLabel>
+                      <FormLabel>Week Order</FormLabel>
                       <FormControl>
-                        <Input placeholder="Week-1" {...field} />
+                        <Input
+                          placeholder="1"
+                          type="number"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -220,7 +314,7 @@ export default function CreateWeekPage() {
                     <FormItem>
                       <FormLabel>Week Title</FormLabel>
                       <FormControl>
-                        <Input placeholder="Basic computer skills" {...field} />
+                        <Input placeholder="Week-1" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -233,21 +327,37 @@ export default function CreateWeekPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Group Session</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl className="w-full">
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a group session" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="group 1">group 1</SelectItem>
-                          <SelectItem value="group 2">group 2</SelectItem>
-                          <SelectItem value="group 3">group 3</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {isLoadingGroupSessions ? (
+                        <Skeleton className="h-10 w-full" />
+                      ) : (
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl className="w-full">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a group session" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {groupSessions.length === 0 &&
+                            isLoadingGroupSessions === false ? (
+                              <p className="text-sm text-gray-500">
+                                No group sessions found
+                              </p>
+                            ) : (
+                              groupSessions.map((session) => (
+                                <SelectItem
+                                  key={session._id}
+                                  value={session._id}
+                                >
+                                  {session.name}
+                                </SelectItem>
+                              ))
+                            )}
+                          </SelectContent>
+                        </Select>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -259,21 +369,37 @@ export default function CreateWeekPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Live Session</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl className="w-full">
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a group session" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="live 1">live 1</SelectItem>
-                          <SelectItem value="live 2">live 2</SelectItem>
-                          <SelectItem value="live 3">live 3</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {isLoadingLiveSessions ? (
+                        <Skeleton className="h-10 w-full" />
+                      ) : (
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl className="w-full">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a group session" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {liveSessions.length === 0 &&
+                            isLoadingLiveSessions === false ? (
+                              <p className="text-sm text-gray-500">
+                                No live sessions found
+                              </p>
+                            ) : (
+                              liveSessions.map((session) => (
+                                <SelectItem
+                                  key={session._id}
+                                  value={session._id}
+                                >
+                                  {session.title}
+                                </SelectItem>
+                              ))
+                            )}
+                          </SelectContent>
+                        </Select>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -283,8 +409,16 @@ export default function CreateWeekPage() {
                   <Button
                     type="submit"
                     className="bg-green-500 text-white hover:bg-orange-600"
+                    disabled={isLoading}
                   >
-                    Save & Next →
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="animate-spin" />
+                        <span className="ml-2">Creating Week...</span>
+                      </>
+                    ) : (
+                      "Create Week"
+                    )}
                   </Button>
                 </div>
               </form>
