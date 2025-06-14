@@ -32,3 +32,38 @@ export interface CreateCourse {
   course_type: string;
   delivery_method: string;
 } 
+
+export interface CreatePhase {
+  course: string;
+  phaseTitle: string;
+  displayTitle: string;
+  description: string;
+  phaseOrder: number;
+  phaseIcon: File;
+} 
+
+export interface CreateWeek {
+  phase: string;
+  title: string;
+  group_session: string;
+  live_session: string;
+  order_number: number;
+}
+
+export interface Phase {
+  _id: string;
+  title: string;
+  description: string;
+  phaseOrder: number;
+  phaseIcon: string;
+}
+
+export interface GroupSession {
+  _id: string;
+  name: string;
+}
+
+export interface LiveSession {
+  _id: string;
+  title: string;
+}

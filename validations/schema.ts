@@ -2,21 +2,26 @@ import { z } from "zod";
 
 // Create Phase Schema
 export const createPhaseSchema = z.object({
-  courseTitle: z.string().min(1, "Course title is required"),
-  phaseName: z.string().min(1, "Phase name is required"),
-  phaseTitle: z.string().min(1, "Phase title is required"),
-  phaseUrl: z.string().min(1, "Phase URL is required"),
-  description: z.string().min(1, "Description is required"),
-  phaseIcon: z.any().optional(),
+  course: z.string().min(1, "Course title is required"),
+  title: z.string().min(1, "Phase title is required"),
+  display_title: z.string().min(1, "Display title is required"),
+  description: z.string().min(6, "Description is required"),
+  icon_url: z
+    .instanceof(File)
+    .refine(
+      (file) => file.size <= 1024 * 1024 * 5,
+      "File size must be less than 5MB"
+    ),
+  order_number: z.number().min(1, "Phase order is required"),
 });
 
 export const createWeekSchema = z.object({
   courseTitle: z.string().min(6, "Course title is required"),
   phaseName: z.string().min(6, "Phase name is required"),
-  weekName: z.string().min(6, "Week name is required"),
-  weekTitle: z.string().min(6, "Week title is required"),
+  weekTitle: z.string().min(5, "Week title is required"),
   groupSession: z.string().min(6, "Group session is required"),
   liveSession: z.string().min(6, "Live session is required"),
+  order_number: z.number().min(1, "Week order is required"),
 });
 
 export const createClassSchema = z.object({
