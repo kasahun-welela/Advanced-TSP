@@ -53,6 +53,12 @@ export async function login(formData: { email: string; password: string }) {
         error: "Invalid credentials",
       };
     }
+    if (axios.isAxiosError(error) && error.response?.status === 503) {
+      return {
+        success: false,
+        error: "Server is down, please try again later",  
+      };
+    }
     return {
       success: false,
       error: "An unexpected error occurred",

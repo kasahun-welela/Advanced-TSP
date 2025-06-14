@@ -1,6 +1,6 @@
 "use server";
 
-import { CreateCourse, Course } from "@/interfaces";
+import { CreateCourse, Course, CreatePhase } from "@/interfaces";
 import axiosInstance from "@/lib/axios";
 
 export async function createCourse(formData: CreateCourse) {
@@ -92,6 +92,34 @@ export async function updateCourse(courseId: string, formData: Partial<Course>) 
   } catch (error: unknown) {
     console.error("Update course error:", error);
     const errorMessage = error instanceof Error ? error.message : "Failed to update course";
+    return {
+      success: false,
+      error: errorMessage
+    };
+  }
+}
+
+export async function createCoursePhase(formData: CreatePhase) {
+  try {
+    const res = await axiosInstance.post("/phases", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    if(res.data.success) {
+      return {
+        success: true,
+        data: res.data,
+      };
+    } else {
+      return {  
+        success: false,
+        error: res.data.message,
+      };
+    }
+  } catch (error: unknown) {
+    console.error("Create phase error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to create phase";
     return {
       success: false,
       error: errorMessage

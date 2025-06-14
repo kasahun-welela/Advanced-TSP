@@ -32,3 +32,12 @@ export interface CreateCourse {
   course_type: string;
   delivery_method: string;
 } 
+
+export interface CreatePhase {
+  course: string;
+  phaseTitle: string;
+  displayTitle: string;
+  description: string;
+  phaseOrder: number;
+  phaseIcon: File;
+} 
