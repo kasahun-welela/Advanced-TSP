@@ -31,7 +31,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { createWeekSchema } from "@/validations/schema";
 import DashboardHeader from "@/components/DashboardHeader";
-import { getGroupSessions } from "@/app/actions/session";
+import { getGroupSessions, getLiveSessions } from "@/app/actions/session";
 
 export default function CreateWeekPage() {
   const router = useRouter();
@@ -43,6 +43,8 @@ export default function CreateWeekPage() {
   const [isLoadingPhases, setIsLoadingPhases] = useState(false);
   const [groupSessions, setGroupSessions] = useState<any[]>([]);
   const [isLoadingGroupSessions, setIsLoadingGroupSessions] = useState(false);
+  const [liveSessions, setLiveSessions] = useState<any[]>([]);
+  const [isLoadingLiveSessions, setIsLoadingLiveSessions] = useState(false);
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -64,7 +66,6 @@ export default function CreateWeekPage() {
         const res = await getGroupSessions();
         if (res.success) {
           setGroupSessions(res.data?.data || []);
-          console.log("groupSessions", res.data?.data);
         }
       } catch (error: unknown) {
         console.error("Failed to fetch group sessions", error);
@@ -73,8 +74,25 @@ export default function CreateWeekPage() {
         setIsLoadingGroupSessions(false);
       }
     };
+    const fetchLiveSessions = async () => {
+      try {
+        setIsLoadingLiveSessions(true);
+        const res = await getLiveSessions();
+        if (res.success) {
+          setLiveSessions(res.data?.data || []);
+          console.log("liveSessions", res.data?.data);
+        }
+      } catch (error: unknown) {
+        console.error("Failed to fetch live sessions", error);
+        toast.error("Failed to fetch live sessions");
+      } finally {
+        setIsLoadingLiveSessions(false);
+      }
+    };
+
     fetchCourses();
     fetchGroupSessions();
+    fetchLiveSessions();
   }, []);
 
   const form = useForm<z.infer<typeof createWeekSchema>>({
@@ -285,59 +303,69 @@ export default function CreateWeekPage() {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="groupSession"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Group Session</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl className="w-full">
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a group session" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {groupSessions.map((session) => (
-                            <SelectItem key={session._id} value={session._id}>
-                              {session.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {isLoadingGroupSessions ? (
+                  <Skeleton className="h-10 w-full" />
+                ) : (
+                  <FormField
+                    control={form.control}
+                    name="groupSession"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Group Session</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl className="w-full">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a group session" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {groupSessions.map((session) => (
+                              <SelectItem key={session._id} value={session._id}>
+                                {session.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
-                <FormField
-                  control={form.control}
-                  name="liveSession"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Live Session</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl className="w-full">
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a group session" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="live 1">live 1</SelectItem>
-                          <SelectItem value="live 2">live 2</SelectItem>
-                          <SelectItem value="live 3">live 3</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {isLoadingLiveSessions ? (
+                  <Skeleton className="h-10 w-full" />
+                ) : (
+                  <FormField
+                    control={form.control}
+                    name="liveSession"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Live Session</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl className="w-full">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a group session" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {liveSessions.map((session) => (
+                              <SelectItem key={session._id} value={session._id}>
+                                {session.title}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
                 <div className="flex justify-end gap-4 pt-4">
                   <Button

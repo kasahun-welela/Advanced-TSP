@@ -18,3 +18,20 @@ export async function getGroupSessions() {
     };
   }
 }
+
+export async function getLiveSessions() {
+  try {
+    const res = await axiosInstance.get("/live-sessions");
+    return {
+      success: true,
+      data: res.data,
+    };
+  } catch (error: unknown) {
+    console.error("Get live sessions error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to get live sessions";
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}
