@@ -23,7 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
-import { getAllCourses } from "@/app/actions/course";
+import { getAllCourses, getPhasesByCourseId } from "@/app/actions/course";
 import { Course } from "@/interfaces";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -32,23 +32,14 @@ import { Video } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import DashboardHeader from "@/components/DashboardHeader";
 
-// const tabs = [
-//   { label: "Create Class", path: "/admin/classes/createClass" },
-//   { label: "Create Class Video", path: "/admin/classes/addVideo" },
-//   { label: "Create Checklist Item", path: "/admin/classes/createChecklist" },
-//   {
-//     label: "Create Class Component",
-//     path: "/admin/classes/createClassComponent",
-//   },
-// ];
-
 export default function CreateClassVideoPage() {
   const router = useRouter();
   const pathname = usePathname();
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
-
+  const [isLoadingPhases, setIsLoadingPhases] = useState(false);
+  const [phases, setPhases] = useState<any[]>([]);
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -80,6 +71,19 @@ export default function CreateClassVideoPage() {
       disableVideo: false,
     },
   });
+
+  const fetchPhases = async (courseId: string) => {
+    // this for fetching phases by course id
+    setIsLoadingPhases(true);
+    const res = await getPhasesByCourseId(courseId);
+    console.log("phases", res);
+    if (res.success) {
+      setPhases(res.data?.data || []);
+    } else {
+      toast.error(res.error);
+    }
+    setIsLoadingPhases(false);
+  };
 
   async function onSubmit(values: z.infer<typeof createClassVideoSchema>) {
     console.log("values", values);
@@ -183,7 +187,10 @@ export default function CreateClassVideoPage() {
                     <FormItem>
                       <FormLabel>Course Title</FormLabel>
                       <Select
-                        onValueChange={field.onChange}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          fetchPhases(value);
+                        }}
                         defaultValue={field.value}
                       >
                         <FormControl className="w-full">
@@ -210,25 +217,39 @@ export default function CreateClassVideoPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Select Phase</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl className="w-full">
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a phase" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="phase 1">phase 1</SelectItem>
-                          <SelectItem value="phase 2">phase 2</SelectItem>
-                          <SelectItem value="phase 3">phase 3</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {isLoadingPhases ? (
+                        <Skeleton className="h-10 w-full" />
+                      ) : (
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl className="w-full">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a phase" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {phases.length === 0 &&
+                            isLoadingPhases === false ? (
+                              <p className="text-sm text-gray-500">
+                                No phases found for this course
+                              </p>
+                            ) : (
+                              phases.map((phase) => (
+                                <SelectItem key={phase._id} value={phase._id}>
+                                  {phase.title}
+                                </SelectItem>
+                              ))
+                            )}
+                          </SelectContent>
+                        </Select>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="weekName"
