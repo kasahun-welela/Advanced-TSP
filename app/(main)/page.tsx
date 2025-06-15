@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div className="md:max-w-[80%] max-w-[90%] mx-auto">
       <Hero />
-      <Services />
+      {/* <Services /> */}
       <Program />
       <Staff />
     </div>
