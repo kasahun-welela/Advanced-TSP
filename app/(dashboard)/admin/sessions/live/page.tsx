@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Video, Trash } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -48,7 +47,7 @@ export default function CreateLiveSessionPage() {
   const [liveSessions, setLiveSessions] = useState<GetLiveSession[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
-  const [fieldsValues, setFieldsValues] = useState<any>([]);
+  // const [fieldsValues, setFieldsValues] = useState<any>([]);
   useEffect(() => {
     const fetchLiveSessions = async () => {
       const res = await getLiveSessions();
@@ -96,7 +95,7 @@ export default function CreateLiveSessionPage() {
     const res = await getLiveSessionsByCourseId(courseId);
 
     if (res.success) {
-      setFieldsValues(res.data.data);
+      // setFieldsValues(res.data.data);
       console.log("fields values", res);
     }
   };

@@ -1,4 +1,4 @@
-import Services from "@/components/Services";
+// import Services from "@/components/Services";
 import Program from "@/components/Program";
 import Staff from "@/components/Staff";
 import Hero from "@/components/Hero";
