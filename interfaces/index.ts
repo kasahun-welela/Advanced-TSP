@@ -96,3 +96,8 @@ export interface GetLiveSession {
     email: string;
   };
 }
+
+export interface ChangePassword {
+  currentPassword: string;
+  newPassword: string;
+}
