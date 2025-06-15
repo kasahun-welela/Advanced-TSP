@@ -35,3 +35,20 @@ export async function getLiveSessions() {
     };
   }
 }
+
+export async function getLiveSessionsByCourseId(courseId: string) {
+  try {
+    const res = await axiosInstance.get(`/live-sessions?course=${courseId}`);
+    return {
+      success: true,
+      data: res.data,
+    };  
+  } catch (error: unknown) {
+    console.error("Get live sessions by course id error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to get live sessions by course id";
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}

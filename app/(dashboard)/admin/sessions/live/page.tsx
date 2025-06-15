@@ -35,11 +35,20 @@ import { createLiveSessionSchema } from "@/validations/schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { getLiveSessions } from "@/app/actions/session";
-import { GetLiveSession } from "@/interfaces";
+import {
+  getLiveSessions,
+  getLiveSessionsByCourseId,
+} from "@/app/actions/session";
+import { Course, GetLiveSession } from "@/interfaces";
+import { getAllCourses } from "@/app/actions/course";
+import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CreateLiveSessionPage() {
   const [liveSessions, setLiveSessions] = useState<GetLiveSession[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isLoadingCourses, setIsLoadingCourses] = useState(true);
+  const [fieldsValues, setFieldsValues] = useState<any>([]);
   useEffect(() => {
     const fetchLiveSessions = async () => {
       const res = await getLiveSessions();
@@ -48,6 +57,21 @@ export default function CreateLiveSessionPage() {
         console.log("live sessions", res.data.data);
       }
     };
+    const fetchCourses = async () => {
+      try {
+        setIsLoadingCourses(true);
+        const courses = await getAllCourses();
+        if (courses.success) {
+          setCourses(courses.data);
+        }
+      } catch (error: unknown) {
+        console.error("Failed to fetch courses", error);
+        toast.error("Failed to fetch courses");
+      } finally {
+        setIsLoadingCourses(false);
+      }
+    };
+    fetchCourses();
     fetchLiveSessions();
   }, []);
 
@@ -67,6 +91,15 @@ export default function CreateLiveSessionPage() {
       zoom_link: "",
     },
   });
+
+  const fetchFieldsValues = async (courseId: string) => {
+    const res = await getLiveSessionsByCourseId(courseId);
+
+    if (res.success) {
+      setFieldsValues(res.data.data);
+      console.log("fields values", res);
+    }
+  };
 
   const onSubmit = (values: z.infer<typeof createLiveSessionSchema>) => {
     console.log(values);
@@ -93,169 +126,205 @@ export default function CreateLiveSessionPage() {
           <CardTitle>Create Live Session</CardTitle>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-5 grid grid-cols-1 md:grid-cols-2 gap-4"
-            >
-              {/* Course Title */}
-              <FormField
-                control={form.control}
-                name="course"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Course Title</FormLabel>
-                    <Select
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        // fetchPhases(value);
-                      }}
-                      defaultValue={field.value}
-                    >
-                      <FormControl className="w-full">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a course title" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="course 1">course 1</SelectItem>
-                        <SelectItem value="course 2">course 2</SelectItem>
-                        <SelectItem value="course 3">course 3</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {/* Select Phase */}
-              <FormField
-                control={form.control}
-                name="batch"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Select Batch</FormLabel>
-
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl className="w-full">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a phase" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="phase 1">phase 1</SelectItem>
-                        <SelectItem value="phase 2">phase 2</SelectItem>
-                        <SelectItem value="phase 3">phase 3</SelectItem>
-                      </SelectContent>
-                    </Select>
-
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="phase"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phase Name</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl className="w-full">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a week name" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="week 1">week 1</SelectItem>
-                        <SelectItem value="week 2">week 2</SelectItem>
-                        <SelectItem value="week 3">week 3</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="week"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Week Name</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl className="w-full">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a class" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="class 1">class 1</SelectItem>
-                        <SelectItem value="class 2">class 2</SelectItem>
-                        <SelectItem value="class 3">class 3</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="session_type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Session Type</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl className="w-full">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a session" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="session 1">session 1</SelectItem>
-                        <SelectItem value="session 2">session 2</SelectItem>
-                        <SelectItem value="session 3">session 3</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="zoom_link"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Zoom Link</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Zoom Link" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="col-span-1 md:col-span-2 flex justify-center gap-4 pt-4">
-                <Button
-                  type="submit"
-                  className="bg-primary text-white hover:bg-primary/80"
-                >
-                  Create Live Session
-                </Button>
+          {isLoadingCourses ? (
+            <div className="space-y-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full" />
               </div>
-            </form>
-          </Form>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+
+              {/* Submit Button */}
+              <div className="col-span-1 md:col-span-2 flex justify-center gap-4 pt-4">
+                <Skeleton className="h-10 w-32" />
+              </div>
+            </div>
+          ) : (
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-5 grid grid-cols-1 md:grid-cols-2 gap-4"
+              >
+                {/* Course Title */}
+                <FormField
+                  control={form.control}
+                  name="course"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Course Title</FormLabel>
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          fetchFieldsValues(value);
+                        }}
+                        defaultValue={field.value}
+                      >
+                        <FormControl className="w-full">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a course title" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {courses.map((course) => (
+                            <SelectItem key={course._id} value={course._id}>
+                              {course.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {/* Select Phase */}
+                <FormField
+                  control={form.control}
+                  name="batch"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Select Batch</FormLabel>
+
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl className="w-full">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a phase" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="phase 1">phase 1</SelectItem>
+                          <SelectItem value="phase 2">phase 2</SelectItem>
+                          <SelectItem value="phase 3">phase 3</SelectItem>
+                        </SelectContent>
+                      </Select>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phase"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phase Name</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl className="w-full">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a week name" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="week 1">week 1</SelectItem>
+                          <SelectItem value="week 2">week 2</SelectItem>
+                          <SelectItem value="week 3">week 3</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="week"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Week Name</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl className="w-full">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a class" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="class 1">class 1</SelectItem>
+                          <SelectItem value="class 2">class 2</SelectItem>
+                          <SelectItem value="class 3">class 3</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="session_type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Session Type</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl className="w-full">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a session" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="session 1">session 1</SelectItem>
+                          <SelectItem value="session 2">session 2</SelectItem>
+                          <SelectItem value="session 3">session 3</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="zoom_link"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Zoom Link</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Zoom Link" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="col-span-1 md:col-span-2 flex justify-center gap-4 pt-4">
+                  <Button
+                    type="submit"
+                    className="bg-primary text-white hover:bg-primary/80"
+                  >
+                    Create Live Session
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          )}
         </CardContent>
       </Card>
       {/* Sessions Table */}
