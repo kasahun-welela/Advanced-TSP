@@ -12,15 +12,15 @@ export default function Program() {
   const programs = [
     {
       id: 1,
-      title: "UI/UX Design Masterclass",
+      title: "AWS Cloud Essentials",
       description:
-        "Dive into the world of user experience and interface design. Learn to create intuitive, beautiful digital products with hands-on projects and real-world examples.",
+        "Learn the fundamentals of AWS cloud computing, including services like EC2, S3, and IAM. Prepare for AWS certification and build your cloud career.",
       image: "/program1.jpg",
       instructor: "Ajara",
       price: "$299",
       enrolled: "200 Enrolled",
       avatar: "/avatar1.png",
-      duration: "08 hr 30 min",
+      duration: "3 months",
     },
     {
       id: 2,
@@ -32,23 +32,47 @@ export default function Program() {
       price: "$299",
       enrolled: "400 Enrolled",
       avatar: "/avatar2.png",
-      duration: "06 hr 10 min",
+      duration: "6 months",
     },
     {
       id: 3,
-      title: "Front End Development",
+      title: "Full Stack Development",
       description:
-        "Learn HTML, CSS, JavaScript, and modern frameworks to build responsive, interactive websites and web applications from scratch.",
+        "Master both frontend and backend development with React, Node.js, and MongoDB. Build real-world applications and prepare for job opportunities in tech companies.",
       image: "/program3.jpg",
       instructor: "Peter Parker",
       price: "$299",
       enrolled: "300 Enrolled",
       avatar: "/avatar3.png",
-      duration: "02 hr 3 min",
+      duration: "6 months",
+    },
+    {
+      id: 4,
+      title: "Data Science and AI",
+      description:
+        "Learn Python, SQL, and machine learning to analyze data, build predictive models, and prepare for AI-driven roles in tech and business.",
+      image: "/program2.jpg",
+      instructor: "John Smith",
+      price: "$299",
+      enrolled: "300 Enrolled",
+      avatar: "/avatar2.png",
+      duration: "5 months",
+    },
+    {
+      id: 5,
+      title: "Mulesoft Masterclass",
+      description:
+        "Master Mulesoft, the leading integration platform for enterprise application integration. Build scalable, secure, and efficient integrations with hands-on projects.",
+      image: "/program1.jpg",
+      instructor: "John Smith",
+      price: "$299",
+      enrolled: "300 Enrolled",
+      avatar: "/avatar1.png",
+      duration: "4 months",
     },
   ];
   return (
-    <section className="py-16" id="courses">
+    <section className="pb-16" id="courses">
       <h1 className="text-xl md:text-2xl font-bold  my-3  text-primary">
         Explore Our Programs
       </h1>

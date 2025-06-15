@@ -129,4 +129,32 @@ export async function isUserAdmin() {
   return false;
 }
 
+export async function changePassword(formData: { currentPassword: string; newPassword: string }) {
+  try {
+    const response = await axiosInstance.put("/auth/change-password", formData);
+    
+    if (!response.data.success) {
+      return {
+        success: false,
+        error: response.data.error || "Failed to change password",
+      };
+    }
+    
+    return {
+      success: true,
+      message: response.data.message,
+    };
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      return {
+        success: false,
+        error: error.response?.data?.message || error.response?.data?.error || error.message,
+      };
+    }
+    return {
+      success: false,
+      error: "An unexpected error occurred",
+    };
+  }
+}
 

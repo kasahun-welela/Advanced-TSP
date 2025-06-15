@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import clsx from "clsx";
-import { ChevronLeft, ChevronRight, Video, Copy } from "lucide-react";
+import { ChevronLeft, ChevronRight, Video, Trash } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,76 +12,96 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { createLiveSessionSchema } from "@/validations/schema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  getLiveSessions,
+  getLiveSessionsByCourseId,
+} from "@/app/actions/session";
+import { Course, GetLiveSession } from "@/interfaces";
+import { getAllCourses } from "@/app/actions/course";
+import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
+
 export default function CreateLiveSessionPage() {
-  const pathname = usePathname();
+  const [liveSessions, setLiveSessions] = useState<GetLiveSession[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isLoadingCourses, setIsLoadingCourses] = useState(true);
+  // const [fieldsValues, setFieldsValues] = useState<any>([]);
+  useEffect(() => {
+    const fetchLiveSessions = async () => {
+      const res = await getLiveSessions();
+      if (res.success) {
+        setLiveSessions(res.data.data);
+        console.log("live sessions", res.data.data);
+      }
+    };
+    const fetchCourses = async () => {
+      try {
+        setIsLoadingCourses(true);
+        const courses = await getAllCourses();
+        if (courses.success) {
+          setCourses(courses.data);
+        }
+      } catch (error: unknown) {
+        console.error("Failed to fetch courses", error);
+        toast.error("Failed to fetch courses");
+      } finally {
+        setIsLoadingCourses(false);
+      }
+    };
+    fetchCourses();
+    fetchLiveSessions();
+  }, []);
 
   const tabs = [
     { label: "Live Session", path: "/admin/sessions/live" },
     { label: "Group Sessions", path: "/admin/sessions/group" },
   ];
-  const [formData, setFormData] = useState({
-    course: "",
-    batch: "",
-    phase: "",
-    week: "",
-    session: "",
-    zoomLink: "",
+
+  const form = useForm<z.infer<typeof createLiveSessionSchema>>({
+    resolver: zodResolver(createLiveSessionSchema),
+    defaultValues: {
+      course: "",
+      batch: "",
+      phase: "",
+      week: "",
+      session_type: "",
+      zoom_link: "",
+    },
   });
 
-  const [sessions, setSessions] = useState([
-    {
-      createdBy: "Admin",
-      sessionTitle: "Week 1 - Intro",
-      batch: "April-2025",
-      zoomLink: "https://zoom.us/abc",
-      status: "Active",
-    },
-    {
-      createdBy: "Admin",
-      sessionTitle: "Week 2 - HTML",
-      batch: "May-2025",
-      zoomLink: "https://zoom.us/def",
-      status: "Inactive",
-    },
-  ]);
+  const fetchFieldsValues = async (courseId: string) => {
+    const res = await getLiveSessionsByCourseId(courseId);
 
-  const handleChange = (e: { target: { name: string; value: string } }) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleCreate = () => {
-    const { course, batch, phase, week, session, zoomLink } = formData;
-    if (course && batch && phase && week && session && zoomLink) {
-      const newSession = {
-        createdBy: "Admin",
-        sessionTitle: `${week} - ${course}`,
-        batch,
-        group: session,
-        zoomLink,
-        status: "Active",
-      };
-      setSessions([...sessions, newSession]);
-      setFormData({ ...formData, zoomLink: "" });
-    } else {
-      alert("Please fill in all fields.");
+    if (res.success) {
+      // setFieldsValues(res.data.data);
+      console.log("fields values", res);
     }
   };
 
-  const handleDelete = (index: number) => {
-    setSessions(sessions.filter((_, i) => i !== index));
-  };
-
-  const handleStatusChange = (index: number) => {
-    const updatedSessions = [...sessions];
-    updatedSessions[index].status =
-      updatedSessions[index].status === "Active" ? "Inactive" : "Active";
-    setSessions(updatedSessions);
-  };
-
-  const handleCopyLink = (zoomLink: string) => {
-    navigator.clipboard.writeText(zoomLink);
-    alert("Zoom link copied to clipboard!");
+  const onSubmit = (values: z.infer<typeof createLiveSessionSchema>) => {
+    console.log(values);
   };
 
   return (
@@ -93,181 +111,265 @@ export default function CreateLiveSessionPage() {
         <Video className="text-green-500" />
         Create Live Session
       </h1>
-      {/* Top Tabs */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b pb-2 gap-4 mb-6">
-        <div className="flex flex-wrap gap-4">
-          {tabs.map((tab) => (
-            <Link
-              key={tab.path}
-              href={tab.path}
-              className={clsx(
-                "px-4 py-2 rounded-t text-sm font-medium",
-                pathname === tab.path
-                  ? "bg-white text-green-600 border-b-2 border-green-600"
-                  : "text-gray-600 hover:text-black"
-              )}
-            >
-              {tab.label}
-            </Link>
-          ))}
-        </div>
-      </div>
-      {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-sm">
-        <Select
-          onValueChange={(value) => setFormData({ ...formData, course: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select Course" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="fullstack">Fullstack Web Application</SelectItem>
-            <SelectItem value="mulesoft">MuleSoft</SelectItem>
-            <SelectItem value="aws">AWS</SelectItem>
-            <SelectItem value="database">Database</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select
-          onValueChange={(value) => setFormData({ ...formData, batch: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select Batch" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="april-2025">April-2025</SelectItem>
-            <SelectItem value="may-2025">May-2025</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select
-          onValueChange={(value) => setFormData({ ...formData, phase: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select Phase" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="phase 1">Phase 1</SelectItem>
-            <SelectItem value="phase 2">Phase 2</SelectItem>
-            <SelectItem value="phase 3">Phase 3</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select
-          onValueChange={(value) => setFormData({ ...formData, week: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select Week" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="week 1">Week 1: Introduction</SelectItem>
-            <SelectItem value="week 2">Week 2: HTML</SelectItem>
-            <SelectItem value="week 3">Week 3: CSS</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select
-          onValueChange={(value) =>
-            setFormData({ ...formData, session: value })
-          }
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select Live Session" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="LS-1">LS-1</SelectItem>
-            <SelectItem value="LS-2">LS-2</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Tabs */}
+      <div className="flex items-center gap-4 mb-4 border-b border-gray-200 ">
+        {tabs.map((tab) => (
+          <Link key={tab.path} href={tab.path}>
+            {tab.label}
+          </Link>
+        ))}
       </div>
 
-      {/* Zoom Link and Create Button */}
-      <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
-        <Input
-          name="zoomLink"
-          value={formData.zoomLink}
-          onChange={handleChange}
-          placeholder="Zoom Meeting Link"
-          className="w-full md:w-2/3"
-        />
-        <Button
-          onClick={handleCreate}
-          className="bg-green-500 hover:bg-orange-600 text-white"
-        >
-          Create
-        </Button>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Create Live Session</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoadingCourses ? (
+            <div className="space-y-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full" />
+              </div>
 
+              {/* Submit Button */}
+              <div className="col-span-1 md:col-span-2 flex justify-center gap-4 pt-4">
+                <Skeleton className="h-10 w-32" />
+              </div>
+            </div>
+          ) : (
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-5 grid grid-cols-1 md:grid-cols-2 gap-4"
+              >
+                {/* Course Title */}
+                <FormField
+                  control={form.control}
+                  name="course"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Course Title</FormLabel>
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          fetchFieldsValues(value);
+                        }}
+                        defaultValue={field.value}
+                      >
+                        <FormControl className="w-full">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a course title" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {courses.map((course) => (
+                            <SelectItem key={course._id} value={course._id}>
+                              {course.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {/* Select Phase */}
+                <FormField
+                  control={form.control}
+                  name="batch"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Select Batch</FormLabel>
+
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl className="w-full">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a phase" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="phase 1">phase 1</SelectItem>
+                          <SelectItem value="phase 2">phase 2</SelectItem>
+                          <SelectItem value="phase 3">phase 3</SelectItem>
+                        </SelectContent>
+                      </Select>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phase"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phase Name</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl className="w-full">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a week name" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="week 1">week 1</SelectItem>
+                          <SelectItem value="week 2">week 2</SelectItem>
+                          <SelectItem value="week 3">week 3</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="week"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Week Name</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl className="w-full">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a class" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="class 1">class 1</SelectItem>
+                          <SelectItem value="class 2">class 2</SelectItem>
+                          <SelectItem value="class 3">class 3</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="session_type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Session Type</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl className="w-full">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a session" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="session 1">session 1</SelectItem>
+                          <SelectItem value="session 2">session 2</SelectItem>
+                          <SelectItem value="session 3">session 3</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="zoom_link"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Zoom Link</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Zoom Link" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="col-span-1 md:col-span-2 flex justify-center gap-4 pt-4">
+                  <Button
+                    type="submit"
+                    className="bg-primary text-white hover:bg-primary/80"
+                  >
+                    Create Live Session
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          )}
+        </CardContent>
+      </Card>
       {/* Sessions Table */}
       <Card className="p-4 border border-gray-200 shadow-sm">
         <h2 className="text-lg font-semibold mb-4">Live Session Links</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm text-left text-black">
-            <thead className="bg-gray-100 text-gray-600">
-              <tr>
-                <th className="px-4 py-2">Created By</th>
-                <th className="px-4 py-2">Session Title</th>
-                <th className="px-4 py-2">Batch</th>
-                <th className="px-4 py-2">Live Session Link</th>
-                <th className="px-4 py-2">Status</th>
-                <th className="px-4 py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sessions.map((session, index) => (
-                <tr
-                  key={index}
-                  className="border-b border-gray-200 hover:bg-gray-50"
-                >
-                  <td className="px-4 py-2">{session.createdBy}</td>
-                  <td className="px-4 py-2">{session.sessionTitle}</td>
-                  <td className="px-4 py-2">{session.batch}</td>
-                  <td className="px-4 py-2 relative">
-                    <a
-                      href={session.zoomLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 underline"
-                    >
-                      {session.zoomLink}
-                    </a>
-                    {session.status === "Active" && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleCopyLink(session.zoomLink)}
-                        className="absolute top-1 right-1 text-orange-500 hover:text-orange-600"
-                      >
-                        <Copy size={16} />
-                      </Button>
-                    )}
-                  </td>
-                  <td className="px-4 py-2">
-                    <span
-                      onClick={() => handleStatusChange(index)}
-                      className={`cursor-pointer px-2 py-1 text-xs rounded ${
-                        session.status === "Active"
-                          ? "bg-green-500 text-white"
-                          : "bg-red-500 text-white"
-                      }`}
-                    >
-                      {session.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-2">
-                    <Button
-                      variant="link"
-                      className="text-red-500 p-0 h-auto"
-                      onClick={() => handleDelete(index)}
-                    >
-                      Delete
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+
+        <Table>
+          <TableCaption>A list of live sessions.</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Created By</TableHead>
+              <TableHead>Session Title</TableHead>
+              <TableHead>Batch</TableHead>
+              <TableHead>Live Session Link</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {liveSessions.map((session) => (
+              <TableRow key={session._id}>
+                <TableCell className="font-medium">
+                  {session.instructor.name}
+                </TableCell>
+                <TableCell>{session.title}</TableCell>
+                <TableCell>{session.batch.name}</TableCell>
+                <TableCell>
+                  <Link
+                    href={session.meeting_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    {session.meeting_link}
+                  </Link>
+                </TableCell>
+                <TableCell>{session.status}</TableCell>
+                <TableCell>
+                  <Button variant="outline" className="flex items-center gap-1">
+                    <Trash size={16} className="text-red-500" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
 
         {/* Pagination */}
         <div className="flex justify-between items-center mt-4">
