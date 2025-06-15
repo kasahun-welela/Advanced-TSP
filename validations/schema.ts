@@ -59,3 +59,12 @@ export const createCourseSchema = z.object({
       "File size must be less than 5MB"
     ),
 });
+
+export const createLiveSessionSchema = z.object({
+  course: z.string().min(6, "Course title is required"),
+  batch: z.string().min(6, "Batch is required"),
+  phase: z.string().min(4, "Phase is required"),
+  week: z.string().min(4, "Week is required"),
+  session_type: z.string().min(6, "Session type is required"),
+  zoom_link: z.string().min(6, "Zoom link is required"),
+}); 

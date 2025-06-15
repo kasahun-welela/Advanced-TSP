@@ -67,3 +67,32 @@ export interface LiveSession {
   _id: string;
   title: string;
 }
+
+export interface GetLiveSession {
+  _id: string;
+  title: string;
+  description: string;
+  session_date: string;
+  start_time: string;
+  end_time: string;
+  meeting_link: string;
+  session_type: string;
+  is_active: boolean;
+  status: string;
+  week: {
+    title: string;
+    phase: {
+      title: string;
+      course: {
+        title: string;
+      };
+    };
+  };
+  batch: {
+    name: string;
+  };
+  instructor: {
+    name: string;
+    email: string;
+  };
+}
